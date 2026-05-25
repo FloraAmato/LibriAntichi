@@ -1,57 +1,72 @@
-# LibriAntichi · Digital twin del libro antico
+# LibriAntichi · Digital twin del manoscritto antico
 
-Web app statica che simula il degrado di un volume antico in funzione del
-materiale, della legatura, dell'inchiostro e delle condizioni di conservazione.
-Fornisce un avatar 3D che evolve nel tempo e una **early prediction** dei
-fattori di rischio.
+Web app statica che simula il degrado di un manoscritto antico in funzione del
+materiale, della legatura, dell'inchiostro, dello stato di conservazione e
+del luogo fisico in cui è custodito. Fornisce un avatar tridimensionale che
+evolve nel tempo e una **previsione preventiva** dei fattori di rischio.
 
-## Caratteristiche
+Il progetto è organizzato in **due fasi**:
 
-- Avatar 3D del volume (Three.js) con copertina in cuoio, borchie e dorature
-  che si appannano, pagine che ingialliscono, macchie di foxing che emergono e
-  micro-deformazioni man mano che il danno aumenta.
-- Dashboard per impostare:
-  - **Materiale**: pergamena, vellum, papiro (no carta — è un libro antico).
-  - **Legatura**: cuoio pieno, mezza pelle, pergamenata, assi in legno.
-  - **Inchiostri**: ferro-gallico (corrosione attiva), carbonio, miniati.
-  - **Età stimata** del volume (200 → 1000 anni).
-- Sei **locazioni** preset (caveau, biblioteca, museo, soffitta, cantina,
-  magazzino) con T/UR/lux/inquinanti/cicli precaricati.
-- Slider per **temperatura, umidità relativa, illuminamento, inquinanti,
-  cicli T/UR**, presenza di biodeteriogeni, consultazione frequente.
-- Slider temporale 0–200 anni e simulazione "play".
-- KPI in tempo reale: **indice di degrado 0–100**, **aspettativa residua**,
-  anno simulato.
-- Lista di **early prediction** con il fattore dominante (chimico, biologico,
-  fotodegrado, inquinanti, meccanico) e raccomandazioni operative.
+1. **Approccio a regole** — modello deterministico ispirato alla norma
+   ISO 11799, al fattore di accelerazione termica e al moltiplicatore di vita
+   di Michalski.
+2. **Modello stocastico applicato ai nostri manoscritti** — per ogni
+   esemplare costruiamo **cento scenari ambientali** plausibili attorno al
+   profilo del luogo di custodia e calcoliamo la distribuzione della vita
+   residua, il tempo di anticipo per l'intervento conservativo e la frazione
+   di scenari che porta a stati critici.
 
-## Modello
+## Catalogo dei manoscritti
 
-Il calcolo è didattico e prende spunto da:
+L'applicazione non lavora su un campione astratto: il modello viene
+applicato ai manoscritti effettivamente custoditi nella nostra collezione.
+Per ciascun testimone sono descritti:
 
-- **ISO 11799** — intervalli raccomandati T/UR per supporti pergamenacei.
-- **Q10 ≈ 2.5** — raddoppio del tasso di idrolisi/ossidazione ogni ~5–10 °C
-  oltre i 20 °C.
-- **Michalski Lifetime Multiplier** — combinazione moltiplicativa dei fattori
-  ambientali sulla vita relativa di un materiale.
+- **Età anagrafica** (secolo e anni).
+- **Composizione dei materiali**: supporto, legatura, inchiostro,
+  decorazioni.
+- **Stato di conservazione**: se è stato **restaurato** (anno e tipo di
+  intervento), se presenta **muffa** o altri biodeteriogeni attivi, se è
+  oggetto di consultazione frequente.
+- **Esemplari multipli**: lo stesso manoscritto può essere rappresentato da
+  più copie/esemplari, ciascuno custodito in un **luogo fisico** diverso
+  (caveau, biblioteca, museo, soffitta, cantina, magazzino).
 
-I cinque meccanismi modellati: **chimico** (T, UR), **biologico** (UR>65 %,
-T 18–30 °C, presenza biodeteriogeni), **fotodegrado** (lux cumulati),
-**inquinanti** (PM2.5/NOx/solfuri), **meccanico** (cicli T/UR, manipolazione).
+## Modello a regole (Fase 1)
 
-> Modello educational, non sostituisce una diagnosi conservativa professionale.
+I cinque meccanismi modellati sono: **chimico** (idrolisi e ossidazione, in
+funzione di temperatura e umidità relativa), **biologico** (muffe sopra il
+65 per cento di umidità relativa in ambiente caldo, insetti fra 18 e 30
+gradi Celsius), **fotodegrado** (illuminamento cumulativo in lux),
+**inquinanti** (solfuri, ossidi di azoto, ozono) e **meccanico** (cicli
+giornalieri di temperatura e umidità relativa, manipolazione).
 
-## Come pubblicarla sul web
+Le grandezze sono sempre scritte per esteso, senza sigle.
 
-1. Pusha il branch su GitHub.
-2. Nelle **Settings → Pages** del repository scegli "GitHub Actions" come
-   source. Il workflow `.github/workflows/pages.yml` pubblica il sito a ogni
-   push.
-3. L'URL pubblico appare in **Actions → Deploy to GitHub Pages → page_url**.
+## Modello stocastico (Fase 2)
+
+Per ciascun esemplare selezionato vengono generate cento traiettorie
+ambientali con perturbazioni gaussiane attorno al profilo del luogo di
+custodia. La distribuzione risultante di vita residua è caratterizzata da:
+
+- **Mediana** (cinquantesimo percentile).
+- **Scenario pessimistico** (quinto percentile).
+- **Scenario ottimistico** (novantacinquesimo percentile).
+- **Tempo di anticipo per l'intervento conservativo** (decimo percentile):
+  margine utile per programmare un'azione prima che il dieci per cento degli
+  scenari raggiunga lo stato di degrado severo.
+- **Frazione di scenari critici** (vita residua inferiore a trent'anni).
+
+I risultati vengono mostrati come istogramma della distribuzione della vita
+residua e come tabella di esempi dei singoli scenari.
+
+## Pubblicazione
+
+1. Push del branch su GitHub.
+2. In **Settings → Pages** scegli "GitHub Actions" come source. Il workflow
+   `.github/workflows/pages.yml` pubblica il sito a ogni push.
 
 ## Sviluppo locale
-
-Apri `index.html` con qualsiasi server statico (Three.js è caricato via CDN):
 
 ```bash
 python3 -m http.server 8000
@@ -62,11 +77,15 @@ python3 -m http.server 8000
 
 ```
 .
-├── index.html            # markup + import map Three.js
-├── styles.css            # tema "libro antico"
+├── index.html               # markup, due fasi, dashboard
+├── styles.css               # tema "libro antico"
 ├── js/
-│   ├── main.js           # binding dashboard + KPI
-│   ├── book3d.js         # avatar 3D Three.js + texture procedurali
-│   └── degradation.js    # modello tasso annuo, vita residua, prediction
-└── .github/workflows/pages.yml   # deploy automatico
+│   ├── main.js              # binding dashboard, fasi e modello stocastico
+│   ├── book3d.js            # avatar tridimensionale (Three.js)
+│   ├── degradation.js       # modello a regole
+│   ├── manuscripts.js       # catalogo dei manoscritti
+│   └── scenarios.js         # cento scenari Monte Carlo
+└── .github/workflows/pages.yml
 ```
+
+> Modello didattico, non sostituisce una diagnosi conservativa professionale.

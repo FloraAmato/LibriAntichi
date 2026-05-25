@@ -192,8 +192,157 @@ select {
 .pred-list li b { color: var(--ink); font-weight: 600; }
 
 .foot {
-  position: fixed; bottom: 0; left: 0; right: 0;
+  position: relative; margin-top: 32px;
   text-align: center; font-size: 0.72rem; color: var(--muted);
-  padding: 10px; background: rgba(0,0,0,0.4); border-top: 1px solid var(--line);
-  backdrop-filter: blur(6px);
+  padding: 14px; background: rgba(0,0,0,0.4); border-top: 1px solid var(--line);
+}
+
+/* ===== Tab di fase ===== */
+.phase-tabs {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  padding: 20px 28px 0;
+}
+@media (max-width: 900px) { .phase-tabs { grid-template-columns: 1fr; } }
+.phase {
+  text-align: left; padding: 14px 18px; border-radius: 14px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.1));
+  border: 1px solid var(--line); color: var(--ink-dim); cursor: pointer;
+  font-family: inherit; transition: all 0.2s;
+  display: grid; gap: 4px;
+}
+.phase:hover { color: var(--ink); border-color: var(--gold); }
+.phase.on {
+  background: linear-gradient(180deg, rgba(200,155,60,0.22), rgba(200,155,60,0.08));
+  border-color: var(--gold); color: var(--gold-2);
+}
+.phase-num {
+  font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--gold);
+}
+.phase-name { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; color: var(--gold-2); }
+.phase-desc { font-size: 0.78rem; color: var(--ink-dim); line-height: 1.4; }
+
+/* ===== Scheda manoscritto ===== */
+.field { display: grid; gap: 4px; margin-bottom: 10px; }
+.field > span { font-size: 0.78rem; color: var(--ink-dim); }
+
+.manu-card {
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--line);
+  display: grid; gap: 10px;
+}
+.manu-title {
+  font-family: 'Cormorant Garamond', serif; font-size: 1.15rem;
+  color: var(--gold-2); line-height: 1.2;
+}
+.manu-title small { color: var(--ink-dim); font-family: 'Inter', sans-serif; font-size: 0.78rem; }
+.manu-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px;
+}
+.manu-grid > div { display: grid; gap: 2px; }
+.manu-grid .k, .manu-loc .k {
+  font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
+}
+.manu-grid .v, .manu-loc .v { font-size: 0.85rem; color: var(--ink); }
+.manu-loc { display: grid; gap: 2px; padding-top: 4px; border-top: 1px dashed var(--line); }
+.manu-state { display: flex; flex-wrap: wrap; gap: 6px; }
+.badge {
+  font-size: 0.72rem; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--line);
+}
+.badge.ok   { background: rgba(106,170,100,0.15); color: var(--good); border-color: rgba(106,170,100,0.4); }
+.badge.warn { background: rgba(224,162,58,0.15); color: var(--warn); border-color: rgba(224,162,58,0.4); }
+.badge.bad  { background: rgba(196,69,54,0.15);  color: var(--bad);  border-color: rgba(196,69,54,0.4); }
+.manu-note { margin: 4px 0 0; font-size: 0.8rem; color: var(--ink-dim); line-height: 1.45; }
+.manu-note.bad-note { color: #f0a89c; }
+
+/* ===== Sezione modello stocastico ===== */
+.ai-section { margin: 14px 28px 0; }
+.inline-field { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-dim); font-size: 0.8rem; }
+.inline-field input[type="range"] { width: 160px; }
+.inline-field output { font-family: 'Cormorant Garamond', serif; color: var(--gold-2); font-size: 1rem; }
+
+.ai-grid {
+  display: grid; grid-template-columns: 1fr 1.3fr; gap: 18px;
+  padding: 18px 22px 22px;
+}
+.ai-grid > .ai-scenarios { grid-column: 1 / -1; }
+@media (max-width: 1050px) { .ai-grid { grid-template-columns: 1fr; } }
+
+.ai-summary h3, .ai-histo h3, .ai-scenarios h3 {
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--gold-2); margin: 0 0 8px; font-size: 1.1rem;
+}
+.ai-sub { color: var(--muted); font-size: 0.78rem; line-height: 1.4; margin: 0 0 12px; }
+.lead { color: var(--ink-dim); font-size: 0.86rem; line-height: 1.5; }
+
+.metrics { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 6px; }
+.metrics li {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--line); border-radius: 10px;
+}
+.m-label { font-size: 0.78rem; color: var(--ink-dim); }
+.m-value { font-family: 'Cormorant Garamond', serif; color: var(--ink); }
+.m-value b { color: var(--gold-2); font-size: 1.15rem; }
+
+.callout {
+  margin-top: 14px; padding: 12px 14px;
+  background: linear-gradient(180deg, rgba(200,155,60,0.12), rgba(200,155,60,0.02));
+  border: 1px solid var(--gold); border-radius: 12px;
+  color: var(--ink); font-size: 0.88rem; line-height: 1.5;
+}
+
+/* Istogramma */
+.histogram {
+  display: grid; grid-template-columns: repeat(12, 1fr);
+  gap: 4px; align-items: end;
+  height: 220px;
+  padding: 10px;
+  background: rgba(0,0,0,0.3); border: 1px solid var(--line); border-radius: 12px;
+}
+.bar-wrap {
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  height: 100%;
+}
+.bar {
+  width: 100%;
+  background: linear-gradient(180deg, var(--gold-2), var(--gold));
+  border-radius: 4px 4px 0 0;
+  min-height: 2px;
+  box-shadow: 0 -4px 12px rgba(200, 155, 60, 0.2);
+}
+.bar-count {
+  font-size: 0.7rem; color: var(--gold-2); margin-top: 4px;
+  font-family: 'Cormorant Garamond', serif;
+}
+.bar-label {
+  font-size: 0.62rem; color: var(--muted); margin-top: 2px;
+  text-align: center; line-height: 1.1;
+}
+
+/* Tabella scenari */
+.scenarios-table {
+  background: rgba(0,0,0,0.3); border: 1px solid var(--line); border-radius: 12px;
+  overflow: hidden; font-size: 0.8rem;
+}
+.scenarios-table .row {
+  display: grid; grid-template-columns: 0.7fr 1fr 1fr 0.9fr 1.4fr 1.1fr 1fr;
+  padding: 8px 12px; border-bottom: 1px solid var(--line);
+  color: var(--ink-dim);
+}
+.scenarios-table .row:last-child { border-bottom: none; }
+.scenarios-table .row.head {
+  background: rgba(0,0,0,0.4); color: var(--gold-2);
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
+}
+.scenarios-table .row b { color: var(--gold-2); }
+@media (max-width: 900px) {
+  .scenarios-table .row {
+    grid-template-columns: 1fr 1fr; gap: 4px;
+    padding: 10px;
+  }
+  .scenarios-table .row.head { display: none; }
 }

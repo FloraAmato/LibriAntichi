@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>LibriAntichi · Digital Twin del libro antico</title>
-<meta name="description" content="Digital twin di un libro antico: simula condizioni ambientali, materiali e locazione per ottenere una early prediction del degrado." />
+<title>LibriAntichi · Digital twin del libro antico</title>
+<meta name="description" content="Digital twin di un manoscritto antico: simula condizioni ambientali, materiali e luogo di conservazione per ottenere una previsione preventiva del degrado." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -16,7 +16,7 @@
     <span class="seal">L•A</span>
     <div>
       <h1>LibriAntichi</h1>
-      <p class="sub">Digital twin &amp; early prediction del degrado di volumi antichi</p>
+      <p class="sub">Digital twin e previsione preventiva del degrado di manoscritti antichi</p>
     </div>
   </div>
   <div class="status" id="statusChip">
@@ -25,13 +25,26 @@
   </div>
 </header>
 
+<nav class="phase-tabs" role="tablist" aria-label="Fasi del progetto">
+  <button class="phase on" data-phase="regole" role="tab" aria-selected="true">
+    <span class="phase-num">Fase 1</span>
+    <span class="phase-name">Approccio a regole</span>
+    <span class="phase-desc">Modello deterministico ispirato a ISO 11799, fattore di accelerazione termica e moltiplicatori di vita di Michalski.</span>
+  </button>
+  <button class="phase" data-phase="ai" role="tab" aria-selected="false">
+    <span class="phase-num">Fase 2</span>
+    <span class="phase-name">Modello stocastico applicato ai nostri manoscritti</span>
+    <span class="phase-desc">Cento scenari ambientali simulati per ciascun esemplare, con stima della distribuzione della vita residua e del tempo di anticipo per l'intervento.</span>
+  </button>
+</nav>
+
 <main class="layout">
   <!-- Avatar 3D -->
   <section class="card stage">
     <div class="card-head">
       <h2>Avatar del volume</h2>
       <div class="stage-controls">
-        <button id="btnReset" class="ghost">Reset</button>
+        <button id="btnReset" class="ghost">Ripristina</button>
         <button id="btnPlay" class="primary">▶ Simula nel tempo</button>
       </div>
     </div>
@@ -40,20 +53,20 @@
       <div class="overlay">
         <div class="kpi">
           <div class="kpi-label">Indice di degrado</div>
-          <div class="kpi-value"><span id="kpiDamage">0</span><small>/100</small></div>
+          <div class="kpi-value"><span id="kpiDamage">0</span><small>su 100</small></div>
         </div>
         <div class="kpi">
-          <div class="kpi-label">Aspettativa residua</div>
+          <div class="kpi-label">Vita residua attesa</div>
           <div class="kpi-value"><span id="kpiLife">∞</span><small>anni</small></div>
         </div>
         <div class="kpi">
-          <div class="kpi-label">Anno simulato</div>
+          <div class="kpi-label">Anno simulato dall'inizio</div>
           <div class="kpi-value"><span id="kpiYear">0</span><small></small></div>
         </div>
       </div>
     </div>
     <div class="timeline">
-      <label for="timeSlider">Orizzonte temporale (anni)</label>
+      <label for="timeSlider">Orizzonte temporale di simulazione (anni)</label>
       <input id="timeSlider" type="range" min="0" max="200" step="1" value="0" />
       <output id="timeOut">0 anni</output>
     </div>
@@ -61,7 +74,20 @@
 
   <!-- Dashboard -->
   <aside class="card dashboard">
-    <div class="card-head"><h2>Dashboard</h2></div>
+    <div class="card-head"><h2>Dashboard di controllo</h2></div>
+
+    <fieldset>
+      <legend>Manoscritto della nostra collezione</legend>
+      <label class="field">
+        <span>Seleziona il manoscritto</span>
+        <select id="selManuscript"></select>
+      </label>
+      <label class="field">
+        <span>Esemplare / rappresentazione</span>
+        <select id="selExemplar"></select>
+      </label>
+      <div class="manu-card" id="manuCard"></div>
+    </fieldset>
 
     <fieldset>
       <legend>Materiale del volume</legend>
@@ -81,26 +107,26 @@
             <option value="legno">Assi in legno</option>
           </select>
         </label>
-        <label>Inchiostri
+        <label>Inchiostro principale
           <select id="selInk">
             <option value="ferro-gallico">Ferro-gallico</option>
             <option value="carbonio">Carbonio (nero fumo)</option>
-            <option value="miniati">Miniature / pigmenti</option>
+            <option value="miniati">Miniature e pigmenti</option>
           </select>
         </label>
-        <label>Età stimata
+        <label>Età stimata del volume
           <select id="selAge">
-            <option value="200">200 anni (XIX sec.)</option>
-            <option value="400" selected>400 anni (XVII sec.)</option>
-            <option value="700">700 anni (XIV sec.)</option>
-            <option value="1000">1000 anni (XI sec.)</option>
+            <option value="200">Circa 200 anni (XIX secolo)</option>
+            <option value="400" selected>Circa 400 anni (XVII secolo)</option>
+            <option value="700">Circa 700 anni (XIV secolo)</option>
+            <option value="1000">Circa 1000 anni (XI secolo)</option>
           </select>
         </label>
       </div>
     </fieldset>
 
     <fieldset>
-      <legend>Locazione</legend>
+      <legend>Luogo fisico di conservazione</legend>
       <div class="locations" id="locGrid">
         <button data-loc="caveau" class="loc on">Caveau climatizzato</button>
         <button data-loc="biblioteca">Biblioteca storica</button>
@@ -112,24 +138,24 @@
     </fieldset>
 
     <fieldset>
-      <legend>Condizioni ambientali</legend>
+      <legend>Condizioni ambientali misurate</legend>
 
       <div class="slider">
         <div class="slider-row">
           <label for="tempS">Temperatura</label>
-          <span class="val"><b id="tempV">18</b> °C</span>
+          <span class="val"><b id="tempV">18</b> gradi Celsius</span>
         </div>
         <input id="tempS" type="range" min="-5" max="40" step="0.5" value="18" />
-        <div class="hint">Ottimale 16–18 °C · ISO 11799</div>
+        <div class="hint">Intervallo raccomandato 16–18 gradi Celsius — norma ISO 11799</div>
       </div>
 
       <div class="slider">
         <div class="slider-row">
           <label for="rhS">Umidità relativa</label>
-          <span class="val"><b id="rhV">50</b> %</span>
+          <span class="val"><b id="rhV">50</b> per cento</span>
         </div>
         <input id="rhS" type="range" min="10" max="95" step="1" value="50" />
-        <div class="hint">Ottimale 45–55 % · evita cicli &gt;5 %/giorno</div>
+        <div class="hint">Intervallo raccomandato 45–55 per cento, variazione giornaliera al di sotto del 5 per cento</div>
       </div>
 
       <div class="slider">
@@ -138,48 +164,90 @@
           <span class="val"><b id="lightV">30</b> lux</span>
         </div>
         <input id="lightS" type="range" min="0" max="1000" step="5" value="30" />
-        <div class="hint">Esposizione consigliata &lt; 50 lux, UV filtrato</div>
+        <div class="hint">Esposizione consigliata al di sotto di 50 lux, con radiazione ultravioletta filtrata</div>
       </div>
 
       <div class="slider">
         <div class="slider-row">
-          <label for="pollS">Inquinanti (PM2.5/NOx)</label>
-          <span class="val"><b id="pollV">5</b> µg/m³</span>
+          <label for="pollS">Concentrazione di inquinanti</label>
+          <span class="val"><b id="pollV">5</b> microgrammi per metro cubo</span>
         </div>
         <input id="pollS" type="range" min="0" max="120" step="1" value="5" />
-        <div class="hint">Solfuri, NOx, ozono accelerano l'ossidazione</div>
+        <div class="hint">Solfuri, ossidi di azoto e ozono accelerano l'ossidazione</div>
       </div>
 
       <div class="slider">
         <div class="slider-row">
-          <label for="cycleS">Cicli T/UR (Δ giornaliero)</label>
-          <span class="val"><b id="cycleV">2</b> %</span>
+          <label for="cycleS">Variazione giornaliera di temperatura e umidità relativa</label>
+          <span class="val"><b id="cycleV">2</b> per cento</span>
         </div>
         <input id="cycleS" type="range" min="0" max="30" step="0.5" value="2" />
-        <div class="hint">Stress meccanico ai supporti igroscopici</div>
+        <div class="hint">Stress meccanico sui supporti igroscopici</div>
       </div>
 
       <div class="toggles">
         <label class="switch">
           <input type="checkbox" id="chkPest" />
-          <span>Presenza biodeteriogeni (tarli, muffe)</span>
+          <span>Presenza di biodeteriogeni attivi (tarli, muffe)</span>
         </label>
         <label class="switch">
           <input type="checkbox" id="chkHandling" />
-          <span>Consultazione frequente</span>
+          <span>Consultazione frequente del volume</span>
         </label>
       </div>
     </fieldset>
 
     <fieldset class="prediction">
-      <legend>Early prediction</legend>
+      <legend>Indicazioni preventive (approccio a regole)</legend>
       <ul id="predList" class="pred-list"></ul>
     </fieldset>
   </aside>
 </main>
 
+<!-- Fase 2: modello stocastico -->
+<section class="card ai-section" id="aiSection" hidden>
+  <div class="card-head">
+    <h2>Modello stocastico: cento scenari per il manoscritto selezionato</h2>
+    <div class="stage-controls">
+      <label class="inline-field">
+        <span>Ampiezza dell'incertezza ambientale</span>
+        <input id="uncertaintyS" type="range" min="0.3" max="2.2" step="0.1" value="1.0" />
+        <output id="uncertaintyOut">1.0×</output>
+      </label>
+      <button class="primary" id="btnRunEnsemble">Ricostruisci cento scenari</button>
+    </div>
+  </div>
+
+  <div class="ai-grid">
+    <div class="ai-summary">
+      <h3>Sintesi della previsione</h3>
+      <p class="lead" id="aiLead">Genero cento traiettorie ambientali plausibili attorno al profilo del luogo in cui l'esemplare è conservato e calcolo, per ciascuna, la vita residua prima del raggiungimento dello stato di degrado severo.</p>
+      <ul class="metrics">
+        <li><span class="m-label">Vita residua mediana</span><span class="m-value"><b id="mMedian">—</b> anni</span></li>
+        <li><span class="m-label">Scenario pessimistico (quinto percentile)</span><span class="m-value"><b id="mWorst">—</b> anni</span></li>
+        <li><span class="m-label">Scenario ottimistico (novantacinquesimo percentile)</span><span class="m-value"><b id="mBest">—</b> anni</span></li>
+        <li><span class="m-label">Tempo di anticipo per l'intervento (decimo percentile)</span><span class="m-value"><b id="mLeadTime">—</b> anni</span></li>
+        <li><span class="m-label">Frazione di scenari con vita residua inferiore a trent'anni</span><span class="m-value"><b id="mCritical">—</b> per cento</span></li>
+      </ul>
+      <p class="callout" id="aiVerdict">—</p>
+    </div>
+
+    <div class="ai-histo">
+      <h3>Distribuzione degli anni di vita residua sui cento scenari</h3>
+      <p class="ai-sub">Asse orizzontale: anni di vita residua attesa prima del raggiungimento dello stato di degrado severo. Asse verticale: numero di scenari simulati che ricadono in ciascuna fascia.</p>
+      <div class="histogram" id="histogram" aria-label="Istogramma della vita residua sui cento scenari"></div>
+    </div>
+
+    <div class="ai-scenarios">
+      <h3>Esempi di scenari simulati</h3>
+      <p class="ai-sub">Una selezione rappresentativa fra i cento scenari Monte Carlo: ogni riga descrive un possibile andamento delle condizioni ambientali e la corrispondente vita residua attesa.</p>
+      <div class="scenarios-table" id="scenariosTable"></div>
+    </div>
+  </div>
+</section>
+
 <footer class="foot">
-  <span>© LibriAntichi · modello didattico ispirato a ISO 11799 e Michalski Lifetime Multiplier · non sostituisce una diagnosi conservativa</span>
+  <span>© LibriAntichi · modello didattico ispirato alla norma ISO 11799 e al moltiplicatore di vita di Michalski · applicato ai manoscritti della nostra collezione · non sostituisce una diagnosi conservativa professionale</span>
 </footer>
 
 <script type="importmap">
