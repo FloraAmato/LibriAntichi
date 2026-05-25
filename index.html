@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Simulatore scientifico di degrado e conservazione per manoscritti e libri antichi (pergamena, vellum, papiro, cuoio)."/>
+  <title>LibriAntichi — Simulatore di Conservazione</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<!-- ══════════════════════════════════ HEADER ══════════════════════════════════ -->
+<header id="app-header">
+  <div class="header-left">
+    <h1>&#x1F4DC; LibriAntichi</h1>
+    <p class="subtitle">Simulatore scientifico di degrado e conservazione dei manoscritti</p>
+  </div>
+  <div id="degradation-badge">
+    <span id="badge-label">Eccellente</span>
+    <span id="badge-score">0.0%</span>
+    <span id="badge-desc">Conservazione ottimale</span>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════ MAIN ══════════════════════════════════ -->
+<div class="main-grid">
+
+  <!-- ── LEFT: Book avatar + info ── -->
+  <aside class="book-section">
+
+    <div class="book-stage">
+      <div id="book-container"><!-- SVG injected by JS --></div>
+    </div>
+
+    <!-- Material info panel -->
+    <div class="material-info card">
+      <h2>&#x1F4D6; Materiale selezionato</h2>
+      <div id="material-name-display">Pergamena (pelle di pecora/capra)</div>
+      <p id="material-desc-display">Supporto scrittorio ottenuto dalla pelle animale essiccata e raschiata. Altamente igroscopico, reagisce drammaticamente alle variazioni di umidità.</p>
+
+      <div class="opt-params">
+        <div class="opt-param">🌡️ T ottimale: <span id="opt-temp">16–20°C</span></div>
+        <div class="opt-param">💧 UR ottimale: <span id="opt-rh">45–55%</span></div>
+      </div>
+
+      <!-- Condition bars -->
+      <div class="cond-bars">
+        <div class="cond-bar-row">
+          <label>Struttura</label>
+          <div class="bar-track"><div class="bar-fill" id="bar-structural" style="width:100%"></div></div>
+          <span class="bar-pct" id="pct-structural">100%</span>
+        </div>
+        <div class="cond-bar-row">
+          <label>Leggibilità</label>
+          <div class="bar-track"><div class="bar-fill" id="bar-legibility" style="width:100%"></div></div>
+          <span class="bar-pct" id="pct-legibility">100%</span>
+        </div>
+        <div class="cond-bar-row">
+          <label>Decorazioni</label>
+          <div class="bar-track"><div class="bar-fill" id="bar-decoration" style="width:100%"></div></div>
+          <span class="bar-pct" id="pct-decoration">100%</span>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ── RIGHT: Dashboard ── -->
+  <section class="dashboard">
+
+    <!-- Row 1: Location + Material -->
+    <div class="dash-row dash-row-2">
+
+      <div class="card">
+        <div class="card-title">&#x1F4CD; Locazione</div>
+        <select id="location-select"></select>
+        <p id="location-desc"></p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">&#x1F4D6; Materiale del Libro</div>
+        <select id="material-select"></select>
+      </div>
+
+    </div>
+
+    <!-- Row 2: Temp + RH -->
+    <div class="dash-row dash-row-2">
+
+      <div class="card">
+        <div class="card-title">&#x1F321;&#xFE0F; Temperatura</div>
+        <div class="slider-wrap">
+          <div class="slider-header">
+            <label for="temp-slider">Temperatura ambiente</label>
+            <span class="slider-val-chip"><span id="temp-val">18</span>°C</span>
+          </div>
+          <input type="range" id="temp-slider" min="-5" max="50" step="0.5" value="18"/>
+          <div class="optimal-hint">Range sicuro: 16–20°C · sotto 0°C: rischio gelo</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">&#x1F4A7; Umidità Relativa</div>
+        <div class="slider-wrap">
+          <div class="slider-header">
+            <label for="rh-slider">Umidità relativa</label>
+            <span class="slider-val-chip"><span id="rh-val">50</span>%</span>
+          </div>
+          <input type="range" id="rh-slider" min="10" max="98" step="1" value="50"/>
+          <div class="optimal-hint">Range sicuro: 45–55% · sopra 65%: muffe</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Row 3: Light + Pollution -->
+    <div class="dash-row dash-row-2">
+
+      <div class="card">
+        <div class="card-title">&#x2600;&#xFE0F; Esposizione Luminosa</div>
+        <div class="slider-wrap">
+          <div class="slider-header">
+            <label for="light-slider">Illuminamento</label>
+            <span class="slider-val-chip"><span id="light-val">50</span> lux</span>
+          </div>
+          <input type="range" id="light-slider" min="0" max="1000" step="5" value="50"/>
+          <div class="optimal-hint">Max 50 lux (AICCM) · dannoso: UV + visibile</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">&#x1F3ED; Qualità dell'Aria</div>
+        <div class="slider-wrap">
+          <div class="slider-header">
+            <label for="pollution-slider">Inquinamento (SO₂, NOₓ, O₃)</label>
+            <span class="slider-val-chip" id="poll-val">Eccellente</span>
+          </div>
+          <input type="range" id="pollution-slider" min="0" max="10" step="0.1" value="0.8"/>
+          <div class="optimal-hint">SO₂ causa red rot nel cuoio · NOₓ ingiallisce i supporti</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Row 4: Weather -->
+    <div class="dash-row dash-row-1">
+      <div class="card">
+        <div class="card-title">&#x1F326;&#xFE0F; Condizioni Atmosferiche Esterne</div>
+        <div class="weather-grid" id="weather-grid"><!-- injected by JS --></div>
+      </div>
+    </div>
+
+    <!-- Row 5: Time slider -->
+    <div class="dash-row dash-row-1">
+      <div class="card">
+        <div class="card-title">&#x23F3; Simulazione Temporale</div>
+        <div class="slider-wrap">
+          <div class="slider-header">
+            <label for="time-slider">Avanza nel tempo</label>
+            <span class="slider-val-chip"><span id="time-val">0</span> anni</span>
+          </div>
+          <input type="range" id="time-slider" min="0" max="500" step="1" value="0"/>
+          <div class="optimal-hint">Trascina per vedere lo stato del libro dopo N anni nelle condizioni attuali</div>
+        </div>
+        <p class="time-display" id="time-display"></p>
+      </div>
+    </div>
+
+    <!-- Row 6: Live readout -->
+    <div class="dash-row dash-row-1">
+      <div class="card">
+        <div class="card-title">&#x1F4CA; Indicatori di Rischio in Tempo Reale</div>
+        <div class="env-readout">
+          <div class="env-item">
+            <span class="env-item-label">Tasso annuo</span>
+            <span class="env-item-val" id="readout-rate">—</span>
+          </div>
+          <div class="env-item">
+            <span class="env-item-label">Moltiplicatore</span>
+            <span class="env-item-val" id="readout-mult">—</span>
+          </div>
+          <div class="env-item">
+            <span class="env-item-label">Rischio muffe</span>
+            <span class="env-item-val" id="readout-mold">—</span>
+          </div>
+          <div class="env-item">
+            <span class="env-item-label">Red rot (cuoio)</span>
+            <span class="env-item-val" id="readout-rr">—</span>
+          </div>
+          <div class="env-item">
+            <span class="env-item-label">Rischio insetti</span>
+            <span class="env-item-val" id="readout-ins">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<!-- ══════════════════════════════ BOTTOM SECTIONS ══════════════════════════════ -->
+<div class="bottom-sections">
+
+  <!-- Prediction Chart -->
+  <div class="section-block">
+    <h2 class="section-title">&#x1F4C8; Predizione del Degrado nel Tempo (200 anni)</h2>
+    <canvas id="degradation-chart"></canvas>
+  </div>
+
+  <!-- Risk Assessment + Thresholds side by side -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+    <div class="section-block">
+      <h2 class="section-title">&#x26A0;&#xFE0F; Analisi dei Rischi Attivi</h2>
+      <div id="risk-container"><!-- injected by JS --></div>
+    </div>
+
+    <div class="section-block">
+      <h2 class="section-title">&#x23F0; Previsioni di Degrado Critico</h2>
+      <div id="thresholds-container"><!-- injected by JS --></div>
+
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--brd-gold)">
+        <p style="font-size:0.78rem;color:var(--txt-muted);font-style:italic;line-height:1.6">
+          Le stime si basano sul modello di Arrhenius per la degradazione termica,
+          sul concetto di <em>isoperms</em> (ISO 11799) per la relazione T/UR,
+          sul modello di Sedlbauer per il rischio fungino, e sull'equazione
+          fotochimicareciproca per il danno da luce.
+          I materiali considerati sono supporti originali di manoscritti medievali
+          e antichi: pergamena, vellum, papiro, cuoio e tavolette cerate.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Material reference table -->
+  <div class="section-block">
+    <h2 class="section-title">&#x1F4DA; Riferimento Materiali — Sensibilità ai Fattori di Degrado</h2>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:0.80rem;color:var(--txt-sec)">
+        <thead>
+          <tr style="border-bottom:1px solid var(--brd-gold);color:var(--gold)">
+            <th style="text-align:left;padding:8px 10px">Materiale</th>
+            <th style="text-align:center;padding:8px 6px">T ottimale</th>
+            <th style="text-align:center;padding:8px 6px">UR ottimale</th>
+            <th style="text-align:center;padding:8px 6px">Luce</th>
+            <th style="text-align:center;padding:8px 6px">Inquin.</th>
+            <th style="text-align:center;padding:8px 6px">Muffe RH critico</th>
+            <th style="text-align:left;padding:8px 6px">Rischio principale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid rgba(180,140,60,0.12)">
+            <td style="padding:7px 10px;color:var(--txt-main)">Pergamena</td>
+            <td style="text-align:center;padding:7px 6px">18°C</td>
+            <td style="text-align:center;padding:7px 6px">45–55%</td>
+            <td style="text-align:center;padding:7px 6px">★★★☆☆</td>
+            <td style="text-align:center;padding:7px 6px">★★★☆☆</td>
+            <td style="text-align:center;padding:7px 6px">&gt;65%</td>
+            <td style="padding:7px 6px">Cockling, idrolisi collagene</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(180,140,60,0.12)">
+            <td style="padding:7px 10px;color:var(--txt-main)">Vellum</td>
+            <td style="text-align:center;padding:7px 6px">17°C</td>
+            <td style="text-align:center;padding:7px 6px">44–54%</td>
+            <td style="text-align:center;padding:7px 6px">★★★★☆</td>
+            <td style="text-align:center;padding:7px 6px">★★★☆☆</td>
+            <td style="text-align:center;padding:7px 6px">&gt;63%</td>
+            <td style="padding:7px 6px">Sbiadimento miniature, deformazione</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(180,140,60,0.12)">
+            <td style="padding:7px 10px;color:var(--txt-main)">Papiro</td>
+            <td style="text-align:center;padding:7px 6px">20°C</td>
+            <td style="text-align:center;padding:7px 6px">40–55%</td>
+            <td style="text-align:center;padding:7px 6px">★★★★★</td>
+            <td style="text-align:center;padding:7px 6px">★★☆☆☆</td>
+            <td style="text-align:center;padding:7px 6px">&gt;60%</td>
+            <td style="padding:7px 6px">Fragilità estrema, delamellazione</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(180,140,60,0.12)">
+            <td style="padding:7px 10px;color:var(--txt-main)">Cuoio</td>
+            <td style="text-align:center;padding:7px 6px">18°C</td>
+            <td style="text-align:center;padding:7px 6px">45–55%</td>
+            <td style="text-align:center;padding:7px 6px">★★☆☆☆</td>
+            <td style="text-align:center;padding:7px 6px">★★★★★</td>
+            <td style="text-align:center;padding:7px 6px">&gt;65%</td>
+            <td style="padding:7px 6px">Red rot (SO₂), polverizzazione</td>
+          </tr>
+          <tr>
+            <td style="padding:7px 10px;color:var(--txt-main)">Tavola Cerata</td>
+            <td style="text-align:center;padding:7px 6px">15°C</td>
+            <td style="text-align:center;padding:7px 6px">40–55%</td>
+            <td style="text-align:center;padding:7px 6px">★☆☆☆☆</td>
+            <td style="text-align:center;padding:7px 6px">★☆☆☆☆</td>
+            <td style="text-align:center;padding:7px 6px">&gt;70%</td>
+            <td style="padding:7px 6px">Fusione cera (&gt;25°C), marcescenza del legno</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════ FOOTER ══════════════════════════════════ -->
+<footer>
+  LibriAntichi &mdash; Simulatore scientifico di conservazione &nbsp;|&nbsp;
+  Basato su: ISO 11799 · BS 4971 · Modello di Arrhenius · ISOPERMS · Modello fungino di Sedlbauer &nbsp;|&nbsp;
+  Materiali: pergamena, vellum, papiro, cuoio, tavolette cerate
+</footer>
+
+<script src="js/model.js"></script>
+<script src="js/avatar.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
