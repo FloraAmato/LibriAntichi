@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>LibriAntichi · Digital Twin del libro antico</title>
+<meta name="description" content="Digital twin di un libro antico: simula condizioni ambientali, materiali e locazione per ottenere una early prediction del degrado." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="seal">L•A</span>
+    <div>
+      <h1>LibriAntichi</h1>
+      <p class="sub">Digital twin &amp; early prediction del degrado di volumi antichi</p>
+    </div>
+  </div>
+  <div class="status" id="statusChip">
+    <span class="dot" id="statusDot"></span>
+    <span id="statusText">Condizioni ottimali</span>
+  </div>
+</header>
+
+<main class="layout">
+  <!-- Avatar 3D -->
+  <section class="card stage">
+    <div class="card-head">
+      <h2>Avatar del volume</h2>
+      <div class="stage-controls">
+        <button id="btnReset" class="ghost">Reset</button>
+        <button id="btnPlay" class="primary">▶ Simula nel tempo</button>
+      </div>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="bookCanvas"></canvas>
+      <div class="overlay">
+        <div class="kpi">
+          <div class="kpi-label">Indice di degrado</div>
+          <div class="kpi-value"><span id="kpiDamage">0</span><small>/100</small></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Aspettativa residua</div>
+          <div class="kpi-value"><span id="kpiLife">∞</span><small>anni</small></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Anno simulato</div>
+          <div class="kpi-value"><span id="kpiYear">0</span><small></small></div>
+        </div>
+      </div>
+    </div>
+    <div class="timeline">
+      <label for="timeSlider">Orizzonte temporale (anni)</label>
+      <input id="timeSlider" type="range" min="0" max="200" step="1" value="0" />
+      <output id="timeOut">0 anni</output>
+    </div>
+  </section>
+
+  <!-- Dashboard -->
+  <aside class="card dashboard">
+    <div class="card-head"><h2>Dashboard</h2></div>
+
+    <fieldset>
+      <legend>Materiale del volume</legend>
+      <div class="grid-2">
+        <label>Supporto
+          <select id="selSupport">
+            <option value="pergamena">Pergamena (pecora)</option>
+            <option value="vellum">Vellum / vitello</option>
+            <option value="papiro">Papiro</option>
+          </select>
+        </label>
+        <label>Legatura
+          <select id="selBinding">
+            <option value="cuoio">Cuoio pieno</option>
+            <option value="mezzapelle">Mezza pelle</option>
+            <option value="pergamenata">Pergamenata floscia</option>
+            <option value="legno">Assi in legno</option>
+          </select>
+        </label>
+        <label>Inchiostri
+          <select id="selInk">
+            <option value="ferro-gallico">Ferro-gallico</option>
+            <option value="carbonio">Carbonio (nero fumo)</option>
+            <option value="miniati">Miniature / pigmenti</option>
+          </select>
+        </label>
+        <label>Età stimata
+          <select id="selAge">
+            <option value="200">200 anni (XIX sec.)</option>
+            <option value="400" selected>400 anni (XVII sec.)</option>
+            <option value="700">700 anni (XIV sec.)</option>
+            <option value="1000">1000 anni (XI sec.)</option>
+          </select>
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Locazione</legend>
+      <div class="locations" id="locGrid">
+        <button data-loc="caveau" class="loc on">Caveau climatizzato</button>
+        <button data-loc="biblioteca">Biblioteca storica</button>
+        <button data-loc="museo">Vetrina museale</button>
+        <button data-loc="soffitta">Soffitta</button>
+        <button data-loc="cantina">Cantina umida</button>
+        <button data-loc="magazzino">Magazzino non condizionato</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Condizioni ambientali</legend>
+
+      <div class="slider">
+        <div class="slider-row">
+          <label for="tempS">Temperatura</label>
+          <span class="val"><b id="tempV">18</b> °C</span>
+        </div>
+        <input id="tempS" type="range" min="-5" max="40" step="0.5" value="18" />
+        <div class="hint">Ottimale 16–18 °C · ISO 11799</div>
+      </div>
+
+      <div class="slider">
+        <div class="slider-row">
+          <label for="rhS">Umidità relativa</label>
+          <span class="val"><b id="rhV">50</b> %</span>
+        </div>
+        <input id="rhS" type="range" min="10" max="95" step="1" value="50" />
+        <div class="hint">Ottimale 45–55 % · evita cicli &gt;5 %/giorno</div>
+      </div>
+
+      <div class="slider">
+        <div class="slider-row">
+          <label for="lightS">Illuminamento</label>
+          <span class="val"><b id="lightV">30</b> lux</span>
+        </div>
+        <input id="lightS" type="range" min="0" max="1000" step="5" value="30" />
+        <div class="hint">Esposizione consigliata &lt; 50 lux, UV filtrato</div>
+      </div>
+
+      <div class="slider">
+        <div class="slider-row">
+          <label for="pollS">Inquinanti (PM2.5/NOx)</label>
+          <span class="val"><b id="pollV">5</b> µg/m³</span>
+        </div>
+        <input id="pollS" type="range" min="0" max="120" step="1" value="5" />
+        <div class="hint">Solfuri, NOx, ozono accelerano l'ossidazione</div>
+      </div>
+
+      <div class="slider">
+        <div class="slider-row">
+          <label for="cycleS">Cicli T/UR (Δ giornaliero)</label>
+          <span class="val"><b id="cycleV">2</b> %</span>
+        </div>
+        <input id="cycleS" type="range" min="0" max="30" step="0.5" value="2" />
+        <div class="hint">Stress meccanico ai supporti igroscopici</div>
+      </div>
+
+      <div class="toggles">
+        <label class="switch">
+          <input type="checkbox" id="chkPest" />
+          <span>Presenza biodeteriogeni (tarli, muffe)</span>
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="chkHandling" />
+          <span>Consultazione frequente</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class="prediction">
+      <legend>Early prediction</legend>
+      <ul id="predList" class="pred-list"></ul>
+    </fieldset>
+  </aside>
+</main>
+
+<footer class="foot">
+  <span>© LibriAntichi · modello didattico ispirato a ISO 11799 e Michalski Lifetime Multiplier · non sostituisce una diagnosi conservativa</span>
+</footer>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>
