@@ -8,9 +8,10 @@ const state = {
   rh:        50,
   light:     50,
   pollution: 0.8,
-  years:     0,
+  years:     30,
   projectionYears: 200,
-  score:     0
+  score:     0,
+  animTimer: null
 };
 
 // ── Init ──────────────────────────────────────────────────────────────────────
@@ -24,10 +25,65 @@ function init() {
   initSliders();
   bindLocationChange();
   bindMaterialChange();
+  bindTimeButtons();
 
-  // Set initial location description
+  // Set initial location description + stage atmosphere
   document.getElementById('location-desc').textContent = LOCATIONS[state.location].description;
+  updateStageAtmosphere();
 
+  update();
+}
+
+function updateStageAtmosphere() {
+  const stage = document.getElementById('book-stage');
+  const tag   = document.getElementById('stage-tag');
+  const loc   = LOCATIONS[state.location];
+  if (stage) {
+    // remove any previous loc-* class
+    stage.className = 'book-stage loc-' + state.location;
+  }
+  if (tag) {
+    tag.textContent = `${loc.icon} ${loc.name}`;
+  }
+}
+
+function bindTimeButtons() {
+  const btnA = document.getElementById('btn-animate');
+  const btnR = document.getElementById('btn-reset-time');
+  if (btnA) btnA.addEventListener('click', toggleAnimation);
+  if (btnR) btnR.addEventListener('click', resetTime);
+}
+
+function toggleAnimation() {
+  const btn = document.getElementById('btn-animate');
+  if (state.animTimer) {
+    clearInterval(state.animTimer);
+    state.animTimer = null;
+    if (btn) { btn.classList.remove('playing'); btn.textContent = '▶ Simula nel tempo'; }
+    return;
+  }
+  if (btn) { btn.classList.add('playing'); btn.textContent = '⏸ Pausa'; }
+  state.years = 0;
+  state.animTimer = setInterval(() => {
+    state.years += 2;
+    if (state.years > 200) {
+      clearInterval(state.animTimer);
+      state.animTimer = null;
+      if (btn) { btn.classList.remove('playing'); btn.textContent = '▶ Simula nel tempo'; }
+    }
+    document.getElementById('time-slider').value = state.years;
+    document.getElementById('time-val').textContent = state.years;
+    update();
+  }, 90);
+}
+
+function resetTime() {
+  if (state.animTimer) { clearInterval(state.animTimer); state.animTimer = null; }
+  const btn = document.getElementById('btn-animate');
+  if (btn) { btn.classList.remove('playing'); btn.textContent = '▶ Simula nel tempo'; }
+  state.years = 0;
+  document.getElementById('time-slider').value = 0;
+  document.getElementById('time-val').textContent = 0;
   update();
 }
 
@@ -102,6 +158,7 @@ function bindLocationChange() {
   sel.addEventListener('change', () => {
     state.location = sel.value;
     document.getElementById('location-desc').textContent = LOCATIONS[state.location].description;
+    updateStageAtmosphere();
     applyEnvironment();
   });
 }

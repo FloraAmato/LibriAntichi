@@ -245,65 +245,90 @@ function initBookAvatar(container) {
 
 function updateBookAvatar(score, conditions, materialId) {
   const moldRisk = calculateMoldRisk(conditions.temp, conditions.rh);
+  const rrRisk   = calculateRedRotRisk(materialId, conditions.pollution, conditions.rh);
 
-  // Rebuild SVG only when material changes (handled by caller)
   const svg = document.getElementById('book-svg');
   if (!svg) return;
 
-  // Yellowing (oxidation, aging)
+  const s = score / 100; // 0..1
+
+  // Yellowing / foxing — stronger and starts earlier
   const yellowing = document.getElementById('av-yellowing');
-  if (yellowing) yellowing.setAttribute('opacity', (score / 100 * 0.45).toFixed(3));
+  if (yellowing) yellowing.setAttribute('opacity', (s * 0.65).toFixed(3));
 
-  // Edge darkening
+  // Edge darkening — accumulated dirt, tanning
   const edgeDark = document.getElementById('av-edge-dark');
-  if (edgeDark) edgeDark.setAttribute('opacity', (score / 100 * 0.55).toFixed(3));
+  if (edgeDark) edgeDark.setAttribute('opacity', (s * 0.75).toFixed(3));
 
-  // Water stains appear above 65% RH and grow with score
+  // Water stains: triggered by humidity, scaled by score
   const water = document.getElementById('av-water');
   if (water) {
-    const waterOp = Math.min(1, Math.max(0, conditions.rh - 60) / 35 * (score / 40));
+    const humidExcess = Math.max(0, conditions.rh - 55) / 40;
+    const waterOp = Math.min(0.95, humidExcess * Math.max(0.15, s * 1.4));
     water.setAttribute('opacity', waterOp.toFixed(3));
   }
 
-  // Mold colonies
+  // Mold: visible early in humid conditions
   const mold = document.getElementById('av-mold');
   if (mold) {
-    const moldOp = Math.min(0.9, moldRisk * Math.min(1, score / 30));
-    mold.setAttribute('opacity', moldOp.toFixed(3));
+    const moldBase = moldRisk * (0.3 + s * 1.5);
+    mold.setAttribute('opacity', Math.min(0.95, moldBase).toFixed(3));
   }
 
-  // Cracks appear after ~25% degradation
+  // Cracks: appear from ~15%, full at ~70%
   const cracks = document.getElementById('av-cracks');
   if (cracks) {
-    cracks.setAttribute('opacity', Math.max(0, (score - 22) / 78).toFixed(3));
+    cracks.setAttribute('opacity', Math.max(0, Math.min(1, (score - 12) / 55)).toFixed(3));
   }
 
-  // Tears appear after ~60%
+  // Tears: appear from ~40%
   const tears = document.getElementById('av-tears');
   if (tears) {
-    tears.setAttribute('opacity', Math.max(0, (score - 58) / 42).toFixed(3));
+    tears.setAttribute('opacity', Math.max(0, Math.min(1, (score - 38) / 50)).toFixed(3));
   }
 
-  // Shine fades with age
+  // Specular shine — vanishes quickly
   const shine = document.getElementById('av-shine');
-  if (shine) shine.setAttribute('opacity', ((1 - score / 100) * 0.07).toFixed(3));
+  if (shine) shine.setAttribute('opacity', Math.max(0, (1 - s * 1.8) * 0.10).toFixed(3));
 
-  // Gold decoration fades
+  // Gold decoration fade — more dramatic
   svg.querySelectorAll('.av-gold').forEach(el => {
-    el.style.opacity = Math.max(0.08, 1 - score / 100 * 0.85).toFixed(2);
+    el.style.opacity = Math.max(0.05, 1 - s * 1.0).toFixed(2);
   });
 
-  // Global sepia + brightness filter on svg for overall aging feel
-  const sepia = Math.min(90, score * 0.85);
-  const bright = Math.max(72, 100 - score * 0.22);
-  svg.style.filter = `drop-shadow(4px 6px 16px rgba(0,0,0,0.75)) sepia(${sepia}%) brightness(${bright}%)`;
-
-  // Warp/bend effect at very high degradation
-  if (score > 72) {
-    const warp = (score - 72) / 28;
-    svg.style.transform = `perspective(600px) rotateY(${warp * 4}deg) skewX(${warp * 0.8}deg)`;
+  // Red rot tint for leather: cover gets reddish powder layer
+  if (materialId === 'leather' && rrRisk > 0.1) {
+    const yel = document.getElementById('av-yellowing');
+    if (yel) {
+      yel.setAttribute('fill', '#7A2008');
+      yel.setAttribute('opacity', Math.min(0.85, rrRisk * 0.8 + s * 0.3).toFixed(3));
+    }
   } else {
-    svg.style.transform = '';
+    const yel = document.getElementById('av-yellowing');
+    if (yel) yel.setAttribute('fill', '#7A5510');
+  }
+
+  // Global aging filter — stronger
+  const sepia    = Math.min(95, score * 1.0);
+  const bright   = Math.max(60, 100 - score * 0.35);
+  const contrast = Math.max(70, 100 - score * 0.20);
+  const blur     = score > 75 ? ((score - 75) / 25 * 0.6).toFixed(2) : 0;
+  svg.style.filter = `drop-shadow(4px 6px 18px rgba(0,0,0,0.85)) sepia(${sepia}%) brightness(${bright}%) contrast(${contrast}%) blur(${blur}px)`;
+
+  // Warp / collapse at high degradation
+  const container = document.getElementById('book-container');
+  if (container) {
+    if (score > 50) {
+      const warp = (score - 50) / 50;        // 0..1
+      const rotY = warp * 8;
+      const skewX = warp * 1.8;
+      const tiltZ = warp * 3;
+      const scaleY = 1 - warp * 0.04;
+      container.style.transform =
+        `perspective(700px) rotateY(${rotY}deg) rotateZ(${tiltZ}deg) skewX(${skewX}deg) scaleY(${scaleY})`;
+    } else {
+      container.style.transform = '';
+    }
   }
 }
 

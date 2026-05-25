@@ -28,7 +28,8 @@
   <!-- ── LEFT: Book avatar + info ── -->
   <aside class="book-section">
 
-    <div class="book-stage">
+    <div class="book-stage" id="book-stage">
+      <span class="stage-tag" id="stage-tag">🏛️ Museo</span>
       <div id="book-container"><!-- SVG injected by JS --></div>
     </div>
 
@@ -159,8 +160,12 @@
             <label for="time-slider">Avanza nel tempo</label>
             <span class="slider-val-chip"><span id="time-val">0</span> anni</span>
           </div>
-          <input type="range" id="time-slider" min="0" max="500" step="1" value="0"/>
+          <input type="range" id="time-slider" min="0" max="500" step="1" value="30"/>
           <div class="optimal-hint">Trascina per vedere lo stato del libro dopo N anni nelle condizioni attuali</div>
+        </div>
+        <div class="time-actions">
+          <button class="btn-animate" id="btn-animate">▶ Simula nel tempo</button>
+          <button class="btn-reset" id="btn-reset-time">⟲ Reset</button>
         </div>
         <p class="time-display" id="time-display"></p>
       </div>
