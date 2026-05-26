@@ -1,317 +1,260 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Simulatore scientifico di degrado e conservazione per manoscritti e libri antichi (pergamena, vellum, papiro, cuoio)."/>
-  <title>LibriAntichi — Simulatore di Conservazione</title>
-  <link rel="stylesheet" href="css/style.css"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>LibriAntichi · Simulatore di Conservazione | Voices of Heritage</title>
+<meta name="description" content="Simulatore scientifico del degrado di manoscritti antichi della Biblioteca capitolare di Benevento (codici I-BV 21, 34, 37, 38, 39). Avatar interattivo e previsione preventiva." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-<!-- ══════════════════════════════════ HEADER ══════════════════════════════════ -->
-<header id="app-header">
-  <div class="header-left">
-    <h1>&#x1F4DC; LibriAntichi</h1>
-    <p class="subtitle">Simulatore scientifico di degrado e conservazione dei manoscritti</p>
+<!-- ═══════════════ TOP RED STRIP ═══════════════ -->
+<div class="top-strip"></div>
+
+<!-- ═══════════════ SITE HEADER ═══════════════ -->
+<header class="site-header">
+  <div class="site-logo">
+    <img src="assets/logo-voh.png" alt="Voices of Heritage" />
   </div>
-  <div id="degradation-badge">
-    <span id="badge-label">Eccellente</span>
-    <span id="badge-score">0.0%</span>
-    <span id="badge-desc">Conservazione ottimale</span>
-  </div>
+  <nav class="site-nav">
+    <a class="nav-link" href="#">Home</a>
+    <a class="nav-link" href="#">Glossario</a>
+    <a class="nav-link" href="#">Manoscritti</a>
+    <a class="nav-link" href="#">Canti</a>
+    <a class="nav-link" href="#">Melodie</a>
+    <a class="nav-link active" href="#">Simulatore</a>
+  </nav>
 </header>
 
-<!-- ══════════════════════════════════ MAIN ══════════════════════════════════ -->
-<div class="main-grid">
+<!-- ═══════════════ PAGE TITLE ═══════════════ -->
+<div class="page-title-row">
+  <div class="page-title">
+    <h2>Simulatore di Conservazione</h2>
+  </div>
+  <div class="lang-switcher">
+    <span class="lang-flag it" title="Italiano"></span>
+    <span class="lang-flag en" title="English"></span>
+  </div>
+</div>
+<div class="page-divider"></div>
 
-  <!-- ── LEFT: Book avatar + info ── -->
-  <aside class="book-section">
+<!-- ═══════════════ MAIN LAYOUT ═══════════════ -->
+<main class="layout">
 
-    <div class="book-stage" id="book-stage">
-      <span class="stage-tag" id="stage-tag">🏛️ Museo</span>
+  <!-- ─── STAGE / AVATAR ─── -->
+  <section class="card stage">
+    <div class="card-head">
+      <h2>Avatar del volume</h2>
+      <div class="stage-controls">
+        <button id="btnReset" class="btn-ghost">⟲ Ripristina</button>
+        <button id="btnPlay" class="btn-primary">▶ Simula nel tempo</button>
+      </div>
+    </div>
+
+    <div class="stage-canvas" id="stage-canvas">
+      <span class="stage-tag" id="stage-tag">Caveau climatizzato</span>
       <div id="book-container"><!-- SVG injected by JS --></div>
-    </div>
-
-    <!-- Material info panel -->
-    <div class="material-info card">
-      <h2>&#x1F4D6; Materiale selezionato</h2>
-      <div id="material-name-display">Pergamena (pelle di pecora/capra)</div>
-      <p id="material-desc-display">Supporto scrittorio ottenuto dalla pelle animale essiccata e raschiata. Altamente igroscopico, reagisce drammaticamente alle variazioni di umidità.</p>
-
-      <div class="opt-params">
-        <div class="opt-param">🌡️ T ottimale: <span id="opt-temp">16–20°C</span></div>
-        <div class="opt-param">💧 UR ottimale: <span id="opt-rh">45–55%</span></div>
-      </div>
-
-      <!-- Condition bars -->
-      <div class="cond-bars">
-        <div class="cond-bar-row">
-          <label>Struttura</label>
-          <div class="bar-track"><div class="bar-fill" id="bar-structural" style="width:100%"></div></div>
-          <span class="bar-pct" id="pct-structural">100%</span>
+      <div class="overlay">
+        <div class="kpi">
+          <div class="kpi-label">Indice di degrado</div>
+          <div class="kpi-value"><span id="kpiDamage">0</span><small>su 100</small></div>
         </div>
-        <div class="cond-bar-row">
-          <label>Leggibilità</label>
-          <div class="bar-track"><div class="bar-fill" id="bar-legibility" style="width:100%"></div></div>
-          <span class="bar-pct" id="pct-legibility">100%</span>
+        <div class="kpi">
+          <div class="kpi-label">Vita residua attesa</div>
+          <div class="kpi-value"><span id="kpiLife">∞</span><small>anni</small></div>
         </div>
-        <div class="cond-bar-row">
-          <label>Decorazioni</label>
-          <div class="bar-track"><div class="bar-fill" id="bar-decoration" style="width:100%"></div></div>
-          <span class="bar-pct" id="pct-decoration">100%</span>
+        <div class="kpi">
+          <div class="kpi-label">Anno simulato</div>
+          <div class="kpi-value"><span id="kpiYear">0</span></div>
         </div>
       </div>
     </div>
+
+    <div class="timeline">
+      <label for="timeSlider">Orizzonte temporale</label>
+      <input id="timeSlider" type="range" min="0" max="500" step="1" value="30" />
+      <output id="timeOut">30 anni</output>
+    </div>
+  </section>
+
+  <!-- ─── DASHBOARD ─── -->
+  <aside class="card dashboard">
+    <div class="card-head"><h2>Dashboard di controllo</h2></div>
+
+    <fieldset>
+      <legend>Manoscritto della collezione</legend>
+      <label class="field">
+        <span>Seleziona dal RISM</span>
+        <select id="selManuscript"></select>
+      </label>
+      <div class="manu-card" id="manuCard"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Materiale del volume</legend>
+      <div class="grid-2">
+        <label>Supporto
+          <select id="selSupport">
+            <option value="parchment">Pergamena (pecora/capra)</option>
+            <option value="vellum">Vellum (vitello)</option>
+            <option value="papyrus">Papiro</option>
+            <option value="leather">Cuoio conciato</option>
+            <option value="waxTablet">Tavoletta cerata</option>
+          </select>
+        </label>
+        <label>Età stimata
+          <select id="selAge">
+            <option value="200">Circa 200 anni (XIX sec.)</option>
+            <option value="400">Circa 400 anni (XVII sec.)</option>
+            <option value="700">Circa 700 anni (XIV sec.)</option>
+            <option value="900" selected>Circa 900–1000 anni (XI–XII sec.)</option>
+          </select>
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Luogo di conservazione</legend>
+      <div class="locations" id="locGrid">
+        <button data-loc="vault"      class="loc on">Caveau climatizzato</button>
+        <button data-loc="library"    class="loc">Biblioteca capitolare</button>
+        <button data-loc="museum"     class="loc">Vetrina museale</button>
+        <button data-loc="monastery"  class="loc">Archivio monastico</button>
+        <button data-loc="basement"   class="loc">Cantina umida</button>
+        <button data-loc="attic"      class="loc">Soffitta</button>
+      </div>
+      <p class="loc-desc" id="loc-desc"></p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Condizioni ambientali</legend>
+
+      <div class="slider">
+        <div class="slider-row">
+          <label for="tempS">Temperatura</label>
+          <span class="val"><b id="tempV">18</b> °C</span>
+        </div>
+        <input id="tempS" type="range" min="-5" max="40" step="0.5" value="18" />
+        <div class="hint">Range raccomandato 16–18 °C — ISO 11799</div>
+      </div>
+
+      <div class="slider">
+        <div class="slider-row">
+          <label for="rhS">Umidità relativa</label>
+          <span class="val"><b id="rhV">50</b> %</span>
+        </div>
+        <input id="rhS" type="range" min="10" max="95" step="1" value="50" />
+        <div class="hint">Range 45–55 % · sopra 65 % crescita fungina</div>
+      </div>
+
+      <div class="slider">
+        <div class="slider-row">
+          <label for="lightS">Illuminamento</label>
+          <span class="val"><b id="lightV">30</b> lux</span>
+        </div>
+        <input id="lightS" type="range" min="0" max="1000" step="5" value="30" />
+        <div class="hint">Max 50 lux con UV filtrati — standard AICCM</div>
+      </div>
+
+      <div class="slider">
+        <div class="slider-row">
+          <label for="pollS">Inquinanti (SO₂, NOₓ, O₃)</label>
+          <span class="val"><b id="pollV">1</b> /10</span>
+        </div>
+        <input id="pollS" type="range" min="0" max="10" step="0.1" value="1" />
+        <div class="hint">SO₂ causa "red rot" nelle legature in cuoio</div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Condizione atmosferica esterna</legend>
+      <div class="weather-grid" id="weather-grid"></div>
+    </fieldset>
+
+    <fieldset class="prediction">
+      <legend>Indicazioni preventive</legend>
+      <ul id="predList" class="pred-list"></ul>
+    </fieldset>
 
   </aside>
+</main>
 
-  <!-- ── RIGHT: Dashboard ── -->
-  <section class="dashboard">
+<!-- ═══════════════ BOTTOM SECTIONS ═══════════════ -->
+<div class="full-section">
 
-    <!-- Row 1: Location + Material -->
-    <div class="dash-row dash-row-2">
-
-      <div class="card">
-        <div class="card-title">&#x1F4CD; Locazione</div>
-        <select id="location-select"></select>
-        <p id="location-desc"></p>
-      </div>
-
-      <div class="card">
-        <div class="card-title">&#x1F4D6; Materiale del Libro</div>
-        <select id="material-select"></select>
-      </div>
-
+  <div class="card">
+    <div class="card-head"><h2>Predizione del degrado nel tempo</h2></div>
+    <div class="card-body">
+      <canvas id="degradation-chart"></canvas>
     </div>
-
-    <!-- Row 2: Temp + RH -->
-    <div class="dash-row dash-row-2">
-
-      <div class="card">
-        <div class="card-title">&#x1F321;&#xFE0F; Temperatura</div>
-        <div class="slider-wrap">
-          <div class="slider-header">
-            <label for="temp-slider">Temperatura ambiente</label>
-            <span class="slider-val-chip"><span id="temp-val">18</span>°C</span>
-          </div>
-          <input type="range" id="temp-slider" min="-5" max="50" step="0.5" value="18"/>
-          <div class="optimal-hint">Range sicuro: 16–20°C · sotto 0°C: rischio gelo</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">&#x1F4A7; Umidità Relativa</div>
-        <div class="slider-wrap">
-          <div class="slider-header">
-            <label for="rh-slider">Umidità relativa</label>
-            <span class="slider-val-chip"><span id="rh-val">50</span>%</span>
-          </div>
-          <input type="range" id="rh-slider" min="10" max="98" step="1" value="50"/>
-          <div class="optimal-hint">Range sicuro: 45–55% · sopra 65%: muffe</div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Row 3: Light + Pollution -->
-    <div class="dash-row dash-row-2">
-
-      <div class="card">
-        <div class="card-title">&#x2600;&#xFE0F; Esposizione Luminosa</div>
-        <div class="slider-wrap">
-          <div class="slider-header">
-            <label for="light-slider">Illuminamento</label>
-            <span class="slider-val-chip"><span id="light-val">50</span> lux</span>
-          </div>
-          <input type="range" id="light-slider" min="0" max="1000" step="5" value="50"/>
-          <div class="optimal-hint">Max 50 lux (AICCM) · dannoso: UV + visibile</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">&#x1F3ED; Qualità dell'Aria</div>
-        <div class="slider-wrap">
-          <div class="slider-header">
-            <label for="pollution-slider">Inquinamento (SO₂, NOₓ, O₃)</label>
-            <span class="slider-val-chip" id="poll-val">Eccellente</span>
-          </div>
-          <input type="range" id="pollution-slider" min="0" max="10" step="0.1" value="0.8"/>
-          <div class="optimal-hint">SO₂ causa red rot nel cuoio · NOₓ ingiallisce i supporti</div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Row 4: Weather -->
-    <div class="dash-row dash-row-1">
-      <div class="card">
-        <div class="card-title">&#x1F326;&#xFE0F; Condizioni Atmosferiche Esterne</div>
-        <div class="weather-grid" id="weather-grid"><!-- injected by JS --></div>
-      </div>
-    </div>
-
-    <!-- Row 5: Time slider -->
-    <div class="dash-row dash-row-1">
-      <div class="card">
-        <div class="card-title">&#x23F3; Simulazione Temporale</div>
-        <div class="slider-wrap">
-          <div class="slider-header">
-            <label for="time-slider">Avanza nel tempo</label>
-            <span class="slider-val-chip"><span id="time-val">0</span> anni</span>
-          </div>
-          <input type="range" id="time-slider" min="0" max="500" step="1" value="30"/>
-          <div class="optimal-hint">Trascina per vedere lo stato del libro dopo N anni nelle condizioni attuali</div>
-        </div>
-        <div class="time-actions">
-          <button class="btn-animate" id="btn-animate">▶ Simula nel tempo</button>
-          <button class="btn-reset" id="btn-reset-time">⟲ Reset</button>
-        </div>
-        <p class="time-display" id="time-display"></p>
-      </div>
-    </div>
-
-    <!-- Row 6: Live readout -->
-    <div class="dash-row dash-row-1">
-      <div class="card">
-        <div class="card-title">&#x1F4CA; Indicatori di Rischio in Tempo Reale</div>
-        <div class="env-readout">
-          <div class="env-item">
-            <span class="env-item-label">Tasso annuo</span>
-            <span class="env-item-val" id="readout-rate">—</span>
-          </div>
-          <div class="env-item">
-            <span class="env-item-label">Moltiplicatore</span>
-            <span class="env-item-val" id="readout-mult">—</span>
-          </div>
-          <div class="env-item">
-            <span class="env-item-label">Rischio muffe</span>
-            <span class="env-item-val" id="readout-mold">—</span>
-          </div>
-          <div class="env-item">
-            <span class="env-item-label">Red rot (cuoio)</span>
-            <span class="env-item-val" id="readout-rr">—</span>
-          </div>
-          <div class="env-item">
-            <span class="env-item-label">Rischio insetti</span>
-            <span class="env-item-val" id="readout-ins">—</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </section>
-</div>
-
-<!-- ══════════════════════════════ BOTTOM SECTIONS ══════════════════════════════ -->
-<div class="bottom-sections">
-
-  <!-- Prediction Chart -->
-  <div class="section-block">
-    <h2 class="section-title">&#x1F4C8; Predizione del Degrado nel Tempo (200 anni)</h2>
-    <canvas id="degradation-chart"></canvas>
   </div>
 
-  <!-- Risk Assessment + Thresholds side by side -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+  <div class="section-grid">
 
-    <div class="section-block">
-      <h2 class="section-title">&#x26A0;&#xFE0F; Analisi dei Rischi Attivi</h2>
-      <div id="risk-container"><!-- injected by JS --></div>
-    </div>
-
-    <div class="section-block">
-      <h2 class="section-title">&#x23F0; Previsioni di Degrado Critico</h2>
-      <div id="thresholds-container"><!-- injected by JS --></div>
-
-      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--brd-gold)">
-        <p style="font-size:0.78rem;color:var(--txt-muted);font-style:italic;line-height:1.6">
-          Le stime si basano sul modello di Arrhenius per la degradazione termica,
-          sul concetto di <em>isoperms</em> (ISO 11799) per la relazione T/UR,
-          sul modello di Sedlbauer per il rischio fungino, e sull'equazione
-          fotochimicareciproca per il danno da luce.
-          I materiali considerati sono supporti originali di manoscritti medievali
-          e antichi: pergamena, vellum, papiro, cuoio e tavolette cerate.
+    <div class="card">
+      <div class="card-head"><h2>Previsioni di degrado critico</h2></div>
+      <div class="card-body">
+        <div id="thresholds-container"></div>
+        <p class="hint" style="margin-top:14px">
+          Stime basate su modello di Arrhenius (degradazione termica),
+          <em>isoperms</em> di ISO 11799, moltiplicatore di vita di Michalski
+          e modello fungino di Sedlbauer.
         </p>
       </div>
     </div>
 
-  </div>
-
-  <!-- Material reference table -->
-  <div class="section-block">
-    <h2 class="section-title">&#x1F4DA; Riferimento Materiali — Sensibilità ai Fattori di Degrado</h2>
-    <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:0.80rem;color:var(--txt-sec)">
-        <thead>
-          <tr style="border-bottom:1px solid var(--brd-gold);color:var(--gold)">
-            <th style="text-align:left;padding:8px 10px">Materiale</th>
-            <th style="text-align:center;padding:8px 6px">T ottimale</th>
-            <th style="text-align:center;padding:8px 6px">UR ottimale</th>
-            <th style="text-align:center;padding:8px 6px">Luce</th>
-            <th style="text-align:center;padding:8px 6px">Inquin.</th>
-            <th style="text-align:center;padding:8px 6px">Muffe RH critico</th>
-            <th style="text-align:left;padding:8px 6px">Rischio principale</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="border-bottom:1px solid rgba(180,140,60,0.12)">
-            <td style="padding:7px 10px;color:var(--txt-main)">Pergamena</td>
-            <td style="text-align:center;padding:7px 6px">18°C</td>
-            <td style="text-align:center;padding:7px 6px">45–55%</td>
-            <td style="text-align:center;padding:7px 6px">★★★☆☆</td>
-            <td style="text-align:center;padding:7px 6px">★★★☆☆</td>
-            <td style="text-align:center;padding:7px 6px">&gt;65%</td>
-            <td style="padding:7px 6px">Cockling, idrolisi collagene</td>
-          </tr>
-          <tr style="border-bottom:1px solid rgba(180,140,60,0.12)">
-            <td style="padding:7px 10px;color:var(--txt-main)">Vellum</td>
-            <td style="text-align:center;padding:7px 6px">17°C</td>
-            <td style="text-align:center;padding:7px 6px">44–54%</td>
-            <td style="text-align:center;padding:7px 6px">★★★★☆</td>
-            <td style="text-align:center;padding:7px 6px">★★★☆☆</td>
-            <td style="text-align:center;padding:7px 6px">&gt;63%</td>
-            <td style="padding:7px 6px">Sbiadimento miniature, deformazione</td>
-          </tr>
-          <tr style="border-bottom:1px solid rgba(180,140,60,0.12)">
-            <td style="padding:7px 10px;color:var(--txt-main)">Papiro</td>
-            <td style="text-align:center;padding:7px 6px">20°C</td>
-            <td style="text-align:center;padding:7px 6px">40–55%</td>
-            <td style="text-align:center;padding:7px 6px">★★★★★</td>
-            <td style="text-align:center;padding:7px 6px">★★☆☆☆</td>
-            <td style="text-align:center;padding:7px 6px">&gt;60%</td>
-            <td style="padding:7px 6px">Fragilità estrema, delamellazione</td>
-          </tr>
-          <tr style="border-bottom:1px solid rgba(180,140,60,0.12)">
-            <td style="padding:7px 10px;color:var(--txt-main)">Cuoio</td>
-            <td style="text-align:center;padding:7px 6px">18°C</td>
-            <td style="text-align:center;padding:7px 6px">45–55%</td>
-            <td style="text-align:center;padding:7px 6px">★★☆☆☆</td>
-            <td style="text-align:center;padding:7px 6px">★★★★★</td>
-            <td style="text-align:center;padding:7px 6px">&gt;65%</td>
-            <td style="padding:7px 6px">Red rot (SO₂), polverizzazione</td>
-          </tr>
-          <tr>
-            <td style="padding:7px 10px;color:var(--txt-main)">Tavola Cerata</td>
-            <td style="text-align:center;padding:7px 6px">15°C</td>
-            <td style="text-align:center;padding:7px 6px">40–55%</td>
-            <td style="text-align:center;padding:7px 6px">★☆☆☆☆</td>
-            <td style="text-align:center;padding:7px 6px">★☆☆☆☆</td>
-            <td style="text-align:center;padding:7px 6px">&gt;70%</td>
-            <td style="padding:7px 6px">Fusione cera (&gt;25°C), marcescenza del legno</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="card">
+      <div class="card-head"><h2>Riferimento materiali</h2></div>
+      <div class="card-body">
+        <table class="ref-table">
+          <thead>
+            <tr>
+              <th>Materiale</th>
+              <th>T ott.</th>
+              <th>UR ott.</th>
+              <th>Luce</th>
+              <th>Inquin.</th>
+              <th>Rischio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Pergamena</td><td>18°C</td><td>45–55%</td><td><span class="star">★★★</span></td><td><span class="star">★★★</span></td><td>Cockling, idrolisi del collagene</td></tr>
+            <tr><td>Vellum</td><td>17°C</td><td>44–54%</td><td><span class="star">★★★★</span></td><td><span class="star">★★★</span></td><td>Sbiadimento miniature</td></tr>
+            <tr><td>Papiro</td><td>20°C</td><td>40–55%</td><td><span class="star">★★★★★</span></td><td><span class="star">★★</span></td><td>Fragilità, delamellazione</td></tr>
+            <tr><td>Cuoio</td><td>18°C</td><td>45–55%</td><td><span class="star">★★</span></td><td><span class="star">★★★★★</span></td><td>Red rot (SO₂)</td></tr>
+            <tr><td>Tavoletta cerata</td><td>15°C</td><td>40–55%</td><td><span class="star">★</span></td><td><span class="star">★</span></td><td>Fusione cera &gt; 25°C</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+
   </div>
 
 </div>
 
-<!-- ══════════════════════════════════ FOOTER ══════════════════════════════════ -->
-<footer>
-  LibriAntichi &mdash; Simulatore scientifico di conservazione &nbsp;|&nbsp;
-  Basato su: ISO 11799 · BS 4971 · Modello di Arrhenius · ISOPERMS · Modello fungino di Sedlbauer &nbsp;|&nbsp;
-  Materiali: pergamena, vellum, papiro, cuoio, tavolette cerate
+<!-- ═══════════════ SITE FOOTER ═══════════════ -->
+<footer class="site-footer">
+  <div class="footer-content">
+    <div class="footer-brand">
+      <img src="assets/logo-voh.png" alt="Voices of Heritage" />
+      <p>Voice of Heritage</p>
+    </div>
+    <div class="footer-legal">
+      <h4>Informazioni legali</h4>
+      <a href="#">Privacy</a>
+      <a href="#">Cookie</a>
+    </div>
+    <div class="footer-meta">
+      Simulatore di conservazione applicato ai manoscritti
+      della Biblioteca capitolare di Benevento (I-BV 21, 34, 37, 38, 39).
+      Modello didattico ispirato a ISO 11799, moltiplicatore di vita di
+      Michalski e modello fungino di Sedlbauer.
+    </div>
+  </div>
 </footer>
 
 <script src="js/model.js"></script>

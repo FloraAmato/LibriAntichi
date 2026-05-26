@@ -308,12 +308,12 @@ function updateBookAvatar(score, conditions, materialId) {
     if (yel) yel.setAttribute('fill', '#7A5510');
   }
 
-  // Global aging filter — stronger
+  // Global aging filter (light-theme friendly soft shadow)
   const sepia    = Math.min(95, score * 1.0);
   const bright   = Math.max(60, 100 - score * 0.35);
   const contrast = Math.max(70, 100 - score * 0.20);
   const blur     = score > 75 ? ((score - 75) / 25 * 0.6).toFixed(2) : 0;
-  svg.style.filter = `drop-shadow(4px 6px 18px rgba(0,0,0,0.85)) sepia(${sepia}%) brightness(${bright}%) contrast(${contrast}%) blur(${blur}px)`;
+  svg.style.filter = `drop-shadow(4px 10px 22px rgba(60, 30, 10, 0.25)) sepia(${sepia}%) brightness(${bright}%) contrast(${contrast}%) blur(${blur}px)`;
 
   // Warp / collapse at high degradation
   const container = document.getElementById('book-container');

@@ -35,16 +35,16 @@ function drawDegradationChart(data, currentYear, materialId) {
   const ctx = chartCtx;
   ctx.save();
 
-  // Background
-  ctx.fillStyle = '#12100C';
+  // Background (VoH light theme)
+  ctx.fillStyle = '#F8F6F4';
   ctx.fillRect(0, 0, W, H);
 
-  // Danger zone fills
+  // Danger zone fills (soft tints)
   const zones = [
-    { from: 0,  to: 20, color: 'rgba(60,120,40,0.08)' },
-    { from: 20, to: 45, color: 'rgba(180,140,20,0.08)' },
-    { from: 45, to: 65, color: 'rgba(200,80,20,0.10)' },
-    { from: 65, to: 100,color: 'rgba(160,20,20,0.12)' }
+    { from: 0,  to: 20,  color: 'rgba(91,138,74,0.08)'  },
+    { from: 20, to: 45,  color: 'rgba(198,138,42,0.10)' },
+    { from: 45, to: 65,  color: 'rgba(200,80,40,0.10)'  },
+    { from: 65, to: 100, color: 'rgba(168,37,62,0.12)'  }
   ];
   zones.forEach(z => {
     const y1 = pad.top + ph - (z.to  / 100) * ph;
@@ -53,15 +53,15 @@ function drawDegradationChart(data, currentYear, materialId) {
     ctx.fillRect(pad.left, y1, pw, y2 - y1);
   });
 
-  // Grid lines
-  ctx.strokeStyle = 'rgba(180,140,60,0.1)';
+  // Grid lines (light, subtle)
+  ctx.strokeStyle = 'rgba(168,37,62,0.10)';
   ctx.lineWidth = 1;
 
   for (let i = 0; i <= 4; i++) {
     const y = pad.top + ph - (i / 4) * ph;
     ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + pw, y); ctx.stroke();
-    ctx.fillStyle = 'rgba(210,170,80,0.65)';
-    ctx.font = '11px sans-serif';
+    ctx.fillStyle = '#5A5A5A';
+    ctx.font = '11px Inter, sans-serif';
     ctx.textAlign = 'right';
     ctx.fillText(`${i * 25}%`, pad.left - 8, y + 4);
   }
@@ -71,15 +71,15 @@ function drawDegradationChart(data, currentYear, materialId) {
     const x = pad.left + (i / numV) * pw;
     const yr = Math.round((i / numV) * maxYear);
     ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + ph); ctx.stroke();
-    ctx.fillStyle = 'rgba(210,170,80,0.65)';
+    ctx.fillStyle = '#5A5A5A';
     ctx.textAlign = 'center';
-    ctx.font = '11px sans-serif';
+    ctx.font = '11px Inter, sans-serif';
     ctx.fillText(`${yr} a`, x, pad.top + ph + 18);
   }
 
   // Axis labels
-  ctx.fillStyle = 'rgba(210,170,80,0.75)';
-  ctx.font = '12px Georgia,serif';
+  ctx.fillStyle = '#1F1F1F';
+  ctx.font = '600 12px Inter, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('Anni di conservazione', pad.left + pw / 2, H - 6);
   ctx.save();
@@ -88,12 +88,12 @@ function drawDegradationChart(data, currentYear, materialId) {
   ctx.fillText('Degrado %', 0, 0);
   ctx.restore();
 
-  // Lines to draw
+  // Lines (VoH palette)
   const lines = [
-    { key: 'structural',  color: '#5A9AFF', width: 1.8, label: 'Struttura',    dash: [4, 2] },
-    { key: 'legibility',  color: '#50E878', width: 1.8, label: 'Leggibilità',  dash: [4, 2] },
-    { key: 'decoration',  color: '#FF7878', width: 1.8, label: 'Decorazioni',  dash: [4, 2] },
-    { key: 'score',       color: '#F0C040', width: 3.2, label: 'Degrado Tot.', dash: [] }
+    { key: 'structural',  color: '#3B73B8', width: 1.8, label: 'Struttura',    dash: [4, 3] },
+    { key: 'legibility',  color: '#5B8A4A', width: 1.8, label: 'Leggibilità',  dash: [4, 3] },
+    { key: 'decoration',  color: '#C68A2A', width: 1.8, label: 'Decorazioni',  dash: [4, 3] },
+    { key: 'score',       color: '#A8253E', width: 3.2, label: 'Degrado Tot.', dash: [] }
   ];
 
   lines.forEach(line => {
@@ -125,9 +125,9 @@ function drawDegradationChart(data, currentYear, materialId) {
   ctx.lineTo(pad.left, pad.top + ph);
   ctx.closePath();
   const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + ph);
-  grad.addColorStop(0,   'rgba(240,192,64,0.18)');
-  grad.addColorStop(0.7, 'rgba(240,192,64,0.04)');
-  grad.addColorStop(1,   'rgba(240,192,64,0)');
+  grad.addColorStop(0,   'rgba(168,37,62,0.18)');
+  grad.addColorStop(0.7, 'rgba(168,37,62,0.04)');
+  grad.addColorStop(1,   'rgba(168,37,62,0)');
   ctx.fillStyle = grad;
   ctx.fill();
 
@@ -137,28 +137,28 @@ function drawDegradationChart(data, currentYear, materialId) {
     if (!pt || pt.year === 0) return;
     const x = pad.left + (pt.year / maxYear) * pw;
     const y = pad.top  + ph - (thresh / 100) * ph;
-    const col = thresh < 50 ? '#FFC107' : thresh < 75 ? '#FF9800' : '#F44336';
+    const col = thresh < 50 ? '#C68A2A' : thresh < 75 ? '#D8602A' : '#A8253E';
 
     ctx.beginPath();
     ctx.arc(x, y, 5, 0, Math.PI * 2);
     ctx.fillStyle = col;
     ctx.fill();
-    ctx.strokeStyle = '#12100C';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 2;
     ctx.stroke();
 
     if (x + 75 < W) {
       ctx.fillStyle = col;
-      ctx.font = '10px sans-serif';
+      ctx.font = '600 10px Inter, sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText(`${pt.year}a → ${thresh}%`, x + 8, y - 5);
+      ctx.fillText(`${pt.year}a → ${thresh}%`, x + 8, y - 7);
     }
   });
 
   // Current year marker
   if (currentYear > 0 && currentYear <= maxYear) {
     const cx = pad.left + (currentYear / maxYear) * pw;
-    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.strokeStyle = '#A8253E';
     ctx.lineWidth   = 1.5;
     ctx.setLineDash([5, 4]);
     ctx.beginPath();
@@ -167,8 +167,8 @@ function drawDegradationChart(data, currentYear, materialId) {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.font = 'bold 11px sans-serif';
+    ctx.fillStyle = '#A8253E';
+    ctx.font = '600 11px Inter, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(`Anno ${currentYear}`, cx, pad.top - 10);
   }
@@ -186,8 +186,8 @@ function drawDegradationChart(data, currentYear, materialId) {
     ctx.moveTo(lx, ly); ctx.lineTo(lx + 22, ly);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = 'rgba(220,190,100,0.80)';
-    ctx.font = '11px sans-serif';
+    ctx.fillStyle = '#1F1F1F';
+    ctx.font = '500 11px Inter, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(ln.label, lx + 28, ly + 4);
   });
