@@ -1,0 +1,14 @@
+Serie di 10 immagini del manoscritto beneventano aperto.
+Ordine: da manoscritto01 in perfette condizioni a manoscritto10 completamente rovinato dalle condizioni atmosferiche avverse.
+
+File inclusi:
+manoscritto01_perfette_condizioni.png
+manoscritto02_degrado_minimo.png
+manoscritto03_degrado_leggero.png
+manoscritto04_degrado_lieve.png
+manoscritto05_degrado_moderato.png
+manoscritto06_degrado_medio.png
+manoscritto07_degrado_forte.png
+manoscritto08_degrado_grave.png
+manoscritto09_quasi_totalmente_rovinato.png
+manoscritto10_completamente_rovinato.png

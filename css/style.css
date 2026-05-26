@@ -66,9 +66,12 @@ a:hover { text-decoration: underline; }
   gap: 12px;
 }
 .site-logo img {
-  height: 46px;
+  height: 80px;
   width: auto;
   display: block;
+}
+@media (max-width: 650px) {
+  .site-logo img { height: 56px; }
 }
 .site-nav {
   display: flex;
@@ -209,12 +212,51 @@ a:hover { text-decoration: underline; }
 #book-container {
   display: flex; justify-content: center; align-items: center;
   width: 100%; height: 100%;
-  transition: transform 0.7s ease;
+  position: relative;
 }
-#book-container svg {
-  max-width: 70%; max-height: 92%;
-  transition: filter 0.8s ease;
-  filter: drop-shadow(4px 10px 22px rgba(60, 30, 10, 0.25));
+
+/* ── Stack di immagini fotografiche del manoscritto beneventano ── */
+.ms-stack {
+  position: relative;
+  width: 92%;
+  height: 92%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.6s ease;
+}
+.ms-img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+  transition: opacity 0.6s ease-in-out;
+  filter: drop-shadow(4px 10px 22px rgba(60, 30, 10, 0.30));
+  user-select: none;
+  pointer-events: none;
+}
+.ms-caption {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(255,255,255,0.94);
+  border: 1px solid var(--voh-border);
+  border-radius: var(--radius-pill);
+  padding: 5px 14px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.78rem;
+  z-index: 10;
+  box-shadow: var(--shadow-card);
+}
+.ms-caption-num {
+  font-weight: 700;
+  color: var(--voh-red);
+  font-size: 0.84rem;
+}
+.ms-caption-label {
+  color: var(--voh-text-2);
+  font-weight: 500;
 }
 
 /* Per-location stage backgrounds (subtle, light-theme appropriate) */
@@ -659,11 +701,40 @@ select option { background: #FFFFFF; color: var(--voh-text); }
 .ref-table td:first-child { color: var(--voh-text); font-weight: 600; }
 .ref-table .star { color: var(--voh-red); letter-spacing: 1px; }
 
+/* ── BRAND STRIP (centered big logo above footer) ─────────── */
+.brand-strip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 24px 28px;
+  border-top: 2px solid var(--voh-red);
+  background: linear-gradient(180deg, var(--voh-bg) 0%, var(--voh-bg-soft) 100%);
+  text-align: center;
+}
+.brand-strip img {
+  height: 140px;
+  width: auto;
+  display: block;
+  margin-bottom: 14px;
+}
+.brand-strip-tag {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--voh-text-2);
+  font-style: italic;
+  max-width: 600px;
+}
+@media (max-width: 650px) {
+  .brand-strip img { height: 90px; }
+  .brand-strip { padding: 26px 16px 20px; }
+}
+
 /* ── FOOTER ───────────────────────────────────────────────── */
 .site-footer {
   background: var(--voh-red);
   color: #FFFFFF;
-  margin-top: 40px;
+  margin-top: 0;
   padding: 36px 40px 28px;
   position: relative;
   overflow: hidden;
@@ -698,14 +769,15 @@ select option { background: #FFFFFF; color: var(--voh-text); }
   .footer-content { grid-template-columns: 1fr; text-align: center; }
 }
 .footer-brand img {
-  height: 56px;
+  height: 110px;
   width: auto;
   filter: brightness(0) invert(1);
 }
 .footer-brand p {
   margin-top: 14px;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   letter-spacing: 0.04em;
+  font-weight: 600;
 }
 .footer-legal h4 {
   font-size: 1rem;
