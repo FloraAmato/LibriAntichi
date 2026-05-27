@@ -36,34 +36,27 @@ function initBookAvatar(container) {
 }
 
 function updateBookAvatar(score, conditions, materialId) {
-  // Map score 0–100 to stage 0–9 with smooth blending between adjacent stages
-  const stage     = Math.max(0, Math.min(9, (score / 100) * 9));
-  const lowIdx    = Math.floor(stage);
-  const highIdx   = Math.min(9, lowIdx + 1);
-  const frac      = stage - lowIdx;
+  // Map score 0–100 to a single stage 0–9 (one image per 10% band, no blending)
+  const stageIdx = Math.max(0, Math.min(9, Math.floor(score / 10)));
 
   const imgs = document.querySelectorAll('#book-container .ms-img');
   imgs.forEach((img, i) => {
-    let op = 0;
-    if (i === lowIdx)  op = 1 - frac;
-    if (i === highIdx) op = (i === lowIdx) ? 1 : frac;
-    img.style.opacity = op.toFixed(3);
+    img.style.opacity = (i === stageIdx) ? 1 : 0;
   });
 
-  // Update caption (use the dominant stage)
-  const displayed = frac < 0.5 ? lowIdx : highIdx;
-  const numEl  = document.getElementById('ms-stage-num');
-  const lblEl  = document.getElementById('ms-stage-label');
-  if (numEl) numEl.textContent = `${displayed + 1} / 10`;
-  if (lblEl) lblEl.textContent = MANUSCRIPT_STAGES[displayed].label;
+  // Update caption
+  const numEl = document.getElementById('ms-stage-num');
+  const lblEl = document.getElementById('ms-stage-label');
+  if (numEl) numEl.textContent = `${stageIdx + 1} / 10`;
+  if (lblEl) lblEl.textContent = MANUSCRIPT_STAGES[stageIdx].label;
 
   // Slight extra tint based on extreme conditions, applied to the whole stack
   const stackEl = document.querySelector('#book-container .ms-stack');
   if (stackEl) {
-    const moldExtra  = calculateMoldRisk(conditions.temp, conditions.rh);
-    const dryness    = conditions.rh < 35 ? (35 - conditions.rh) / 35 : 0;
-    const hue        = -moldExtra * 6;          // greenish tint when mold high
-    const sat        = 1 + dryness * 0.10;      // slight saturation when very dry
+    const moldExtra = calculateMoldRisk(conditions.temp, conditions.rh);
+    const dryness   = conditions.rh < 35 ? (35 - conditions.rh) / 35 : 0;
+    const hue       = -moldExtra * 6;
+    const sat       = 1 + dryness * 0.10;
     stackEl.style.filter = `hue-rotate(${hue}deg) saturate(${sat})`;
   }
 }
