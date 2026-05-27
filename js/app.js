@@ -83,7 +83,6 @@ function init() {
   populateManuscripts();
   populateWeatherGrid();
   bindLocationButtons();
-  bindMaterialSelect();
   bindSliders();
   bindTimeControls();
 
@@ -112,7 +111,6 @@ function applyManuscript(id) {
 
   // Auto-set material based on the manuscript's known support
   state.material = m.support;
-  document.getElementById('selSupport').value = m.support;
   rebuildBookAvatar(state.material);
 
   // Render manuscript card (VoH layout: pairs of label/value with red bullets)
@@ -172,16 +170,6 @@ function updateStageAtmosphere() {
   if (tag)   tag.textContent = `${loc.icon} ${loc.name}`;
   const desc = document.getElementById('loc-desc');
   if (desc) desc.textContent = loc.description;
-}
-
-// ── Material select ──────────────────────────────────────────────────────────
-function bindMaterialSelect() {
-  const sel = document.getElementById('selSupport');
-  sel.addEventListener('change', e => {
-    state.material = e.target.value;
-    rebuildBookAvatar(state.material);
-    update();
-  });
 }
 
 // ── Sliders ──────────────────────────────────────────────────────────────────
@@ -331,11 +319,85 @@ function update() {
   const fullProj = projectDegradation(conditions, state.material, state.projectionYears);
   drawDegradationChart(fullProj, state.years, state.material);
 
+  // Update material/structural risk factors
+  renderChemicalGauge(conditions);
+  renderStructuralIndicators(conditions);
+
+  // Update biological risk factors
+  renderBiologicalGauges(conditions);
+
   // Update prediction list
   renderPredictions(conditions);
 
   // Update thresholds
   renderThresholds(conditions);
+}
+
+// ── Risk-factor renderers ─────────────────────────────────────────────────────
+const SEV_LABELS = ['Assente', 'Lieve', 'Moderato', 'Grave'];
+
+const STRUCT_CATS = [
+  { key: 'deformazioni', label: 'Deformazioni' },
+  { key: 'lacerazioni',  label: 'Lacerazioni' },
+  { key: 'fori',         label: 'Fori' },
+  { key: 'fragilita',    label: 'Fragilità' },
+  { key: 'alterazioni',  label: 'Alterazioni cromatiche' }
+];
+
+function gaugeLabel(v01) {
+  if (v01 < 0.20) return { txt: 'Basso',    lvl: 0 };
+  if (v01 < 0.45) return { txt: 'Lieve',    lvl: 1 };
+  if (v01 < 0.70) return { txt: 'Moderato', lvl: 2 };
+  return                  { txt: 'Grave',    lvl: 3 };
+}
+
+const GAUGE_COLORS = ['#5B8A4A', '#B8870F', '#C68A2A', '#C44536'];
+
+function paintGauge(fillEl, labelEl, v01) {
+  const lbl = gaugeLabel(v01);
+  if (fillEl) {
+    fillEl.style.width = (v01 * 100).toFixed(1) + '%';
+    fillEl.style.background = GAUGE_COLORS[lbl.lvl];
+  }
+  if (labelEl) {
+    labelEl.textContent = lbl.txt;
+    labelEl.className = 'risk-level lvl-' + lbl.lvl;
+  }
+}
+
+function renderChemicalGauge(conditions) {
+  const v = getChemicalDegradationLevel(conditions, state.material, state.score);
+  paintGauge(document.getElementById('chemGaugeFill'),
+             document.getElementById('chemLevelLabel'),
+             v);
+}
+
+function renderStructuralIndicators(conditions) {
+  const cont = document.getElementById('structuralList');
+  if (!cont) return;
+  cont.innerHTML = STRUCT_CATS.map(cat => {
+    const sev = getStructuralSeverity(cat.key, state.score, conditions, state.material);
+    const seg = SEV_LABELS.map((label, i) =>
+      `<button class="${i === sev ? `on sev-${sev}` : ''}" type="button">${label}</button>`
+    ).join('');
+    return `
+      <div class="seg-row">
+        <span class="seg-label">${cat.label}</span>
+        <div class="seg-control">${seg}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderBiologicalGauges(conditions) {
+  const moldR = calculateMoldRisk(conditions.temp, conditions.rh);
+  const insR  = getBrimblecombeInsectRisk(conditions.temp, conditions.rh);
+  paintGauge(document.getElementById('moldGaugeFill'),
+             document.getElementById('moldLevelLabel'),
+             moldR);
+  paintGauge(document.getElementById('insectGaugeFill'),
+             document.getElementById('insectLevelLabel'),
+             insR);
 }
 
 function updateStatusChip() {

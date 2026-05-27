@@ -95,29 +95,6 @@
     </fieldset>
 
     <fieldset>
-      <legend>Materiale del volume</legend>
-      <div class="grid-2">
-        <label>Supporto
-          <select id="selSupport">
-            <option value="parchment">Pergamena (pecora/capra)</option>
-            <option value="vellum">Vellum (vitello)</option>
-            <option value="papyrus">Papiro</option>
-            <option value="leather">Cuoio conciato</option>
-            <option value="waxTablet">Tavoletta cerata</option>
-          </select>
-        </label>
-        <label>Età stimata
-          <select id="selAge">
-            <option value="200">Circa 200 anni (XIX sec.)</option>
-            <option value="400">Circa 400 anni (XVII sec.)</option>
-            <option value="700">Circa 700 anni (XIV sec.)</option>
-            <option value="900" selected>Circa 900–1000 anni (XI–XII sec.)</option>
-          </select>
-        </label>
-      </div>
-    </fieldset>
-
-    <fieldset>
       <legend>Luogo di conservazione</legend>
       <div class="locations" id="locGrid">
         <button data-loc="vault"      class="loc on">Caveau climatizzato</button>
@@ -173,6 +150,57 @@
     <fieldset>
       <legend>Condizione atmosferica esterna</legend>
       <div class="weather-grid" id="weather-grid"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Fattori di rischio materiali e strutturali</legend>
+
+      <div class="risk-block">
+        <div class="risk-header">
+          <span class="risk-name">Degrado chimico di carta e materiali organici</span>
+          <span class="risk-level" id="chemLevelLabel">Basso</span>
+        </div>
+        <div class="risk-gauge">
+          <div class="risk-gauge-fill" id="chemGaugeFill"></div>
+          <div class="risk-gauge-ticks"><span></span><span></span><span></span><span></span></div>
+        </div>
+        <p class="hint">Indice ispirato alle isoperms (ISO 11799): combina temperatura, umidità, inquinanti e degrado accumulato.</p>
+      </div>
+
+      <div class="risk-block">
+        <div class="risk-header">
+          <span class="risk-name">Stress meccanico e danno strutturale</span>
+        </div>
+        <div class="seg-list" id="structuralList"><!-- injected by JS --></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Fattori di rischio biologico</legend>
+
+      <div class="risk-block">
+        <div class="risk-header">
+          <span class="risk-name">Crescita fungina e rischio muffe <small>(RI Muffa)</small></span>
+          <span class="risk-level" id="moldLevelLabel">Basso</span>
+        </div>
+        <div class="risk-gauge">
+          <div class="risk-gauge-fill biological" id="moldGaugeFill"></div>
+          <div class="risk-gauge-ticks"><span></span><span></span><span></span><span></span></div>
+        </div>
+        <p class="hint">Modello fungino di Sedlbauer: T+UR governano la germinazione delle spore.</p>
+      </div>
+
+      <div class="risk-block">
+        <div class="risk-header">
+          <span class="risk-name">Infestazione da insetti <small>(Brimblecombe &amp; Lankester, 2013)</small></span>
+          <span class="risk-level" id="insectLevelLabel">Basso</span>
+        </div>
+        <div class="risk-gauge">
+          <div class="risk-gauge-fill biological" id="insectGaugeFill"></div>
+          <div class="risk-gauge-ticks"><span></span><span></span><span></span><span></span></div>
+        </div>
+        <p class="hint">Finestra ottimale per <em>Anobium</em>, <em>Lasioderma</em>, <em>Stegobium</em>: T 18–25 °C, UR 60–75 %.</p>
+      </div>
     </fieldset>
 
     <fieldset class="prediction">

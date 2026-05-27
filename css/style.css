@@ -590,6 +590,120 @@ select option { background: #FFFFFF; color: var(--voh-text); }
   border-color: var(--voh-red);
 }
 
+/* ── RISK BLOCKS (chemical / mechanical / biological) ─────── */
+.risk-block { margin-bottom: 16px; }
+.risk-block:last-child { margin-bottom: 0; }
+.risk-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.risk-name {
+  font-size: 0.86rem;
+  color: var(--voh-text);
+  font-weight: 600;
+  line-height: 1.35;
+}
+.risk-name small {
+  color: var(--voh-text-3);
+  font-weight: 400;
+  font-size: 0.75rem;
+  font-style: italic;
+}
+.risk-level {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.risk-level.lvl-0 { color: var(--voh-good); border-color: var(--voh-good); background: rgba(91,138,74,0.10); }
+.risk-level.lvl-1 { color: #B8870F;        border-color: #B8870F;        background: rgba(184,135,15,0.10); }
+.risk-level.lvl-2 { color: var(--voh-warn); border-color: var(--voh-warn); background: rgba(198,138,42,0.10); }
+.risk-level.lvl-3 { color: var(--voh-bad);  border-color: var(--voh-bad);  background: rgba(196,69,54,0.10); }
+
+/* Horizontal gauge bar */
+.risk-gauge {
+  position: relative;
+  height: 12px;
+  background: var(--voh-bg-soft);
+  border: 1px solid var(--voh-border);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.risk-gauge-fill {
+  height: 100%;
+  width: 0;
+  border-radius: var(--radius-pill);
+  background: var(--voh-good);
+  transition: width 0.45s ease, background-color 0.45s ease;
+}
+.risk-gauge-ticks {
+  position: absolute; inset: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  pointer-events: none;
+}
+.risk-gauge-ticks span {
+  border-right: 1px solid rgba(255,255,255,0.65);
+}
+.risk-gauge-ticks span:last-child { border-right: 0; }
+
+/* Segmented control for structural sub-indicators */
+.seg-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 4px;
+}
+.seg-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+.seg-label {
+  font-size: 0.82rem;
+  color: var(--voh-text-2);
+  font-weight: 500;
+}
+.seg-control {
+  display: inline-flex;
+  border: 1px solid var(--voh-border);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  background: var(--voh-bg);
+}
+.seg-control button {
+  background: transparent;
+  border: 0;
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--voh-text-3);
+  cursor: default;
+  border-right: 1px solid var(--voh-border);
+  white-space: nowrap;
+}
+.seg-control button:last-child { border-right: 0; }
+.seg-control button.on.sev-0 { background: var(--voh-good); color: #FFFFFF; }
+.seg-control button.on.sev-1 { background: #B8870F;        color: #FFFFFF; }
+.seg-control button.on.sev-2 { background: var(--voh-warn); color: #FFFFFF; }
+.seg-control button.on.sev-3 { background: var(--voh-bad);  color: #FFFFFF; }
+@media (max-width: 500px) {
+  .seg-row { grid-template-columns: 1fr; }
+  .seg-control { justify-self: stretch; display: grid; grid-template-columns: repeat(4, 1fr); }
+  .seg-control button { padding: 6px 4px; }
+}
+
 /* ── PREDICTION LIST ───────────────────────────────────────── */
 .prediction { background: var(--voh-bg-soft); }
 .pred-list {

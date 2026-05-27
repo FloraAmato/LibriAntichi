@@ -325,6 +325,71 @@ function getRiskAssessment(conditions, materialId) {
   return risks;
 }
 
+// ── Fattori di rischio materiali e strutturali ──────────────────────────────
+//
+// Degrado chimico (0–1): contribuzioni di temperatura (Arrhenius),
+// umidità (deviazione dal range ottimale 45–55%), inquinanti (SO₂/NOₓ/O₃)
+// e degrado accumulato (score). Indice didattico ispirato alle isoperms ISO 11799.
+function getChemicalDegradationLevel(conditions, materialId, score) {
+  const mat       = MATERIALS[materialId] || MATERIALS.parchment;
+  const tempBoost = Math.max(0, (conditions.temp - mat.optimalTemp) / 25);
+  const rhDelta   = Math.abs(conditions.rh - (mat.rhMin + mat.rhMax) / 2);
+  const rhBoost   = Math.max(0, (rhDelta - 5) / 35);
+  const pollBoost = conditions.pollution / 10;
+  const scoreContrib = score / 100;
+
+  const idx = 0.35 * tempBoost
+            + 0.25 * rhBoost
+            + 0.20 * pollBoost
+            + 0.20 * scoreContrib;
+  return Math.min(1, idx);
+}
+
+// Severity 0..3 (Assente / Lieve / Moderato / Grave) per categoria strutturale
+function getStructuralSeverity(category, score, conditions, materialId) {
+  const insR    = calculateInsectRisk(conditions.temp, conditions.rh);
+  const dryness = conditions.rh < 40 ? (40 - conditions.rh) * 1.5 : 0;
+  const rhStress = Math.max(0, Math.abs(conditions.rh - 50) - 8) * 1.2;
+
+  let v = 0;
+  switch (category) {
+    case 'deformazioni':
+      v = score * 0.95 + rhStress;
+      break;
+    case 'lacerazioni':
+      v = score * 1.05;
+      break;
+    case 'fori':
+      v = score * 0.55 + insR * 65;
+      break;
+    case 'fragilita':
+      v = score * 0.85 + dryness;
+      break;
+    case 'alterazioni':
+      v = score * 0.60 + conditions.light / 22;
+      break;
+    default:
+      v = score;
+  }
+  if (v < 12) return 0; // Assente
+  if (v < 35) return 1; // Lieve
+  if (v < 60) return 2; // Moderato
+  return 3;             // Grave
+}
+
+// Indice di rischio infestazione da insetti (Anobium punctatum, Lasioderma
+// serricorne, Stegobium paniceum) — schema ispirato a Brimblecombe & Lankester
+// (2013): la finestra ottimale è T 18–25°C, UR 60–75%, decadimento esponenziale
+// fuori da questi intervalli; nessuna attività con T<12°C o UR<45%.
+function getBrimblecombeInsectRisk(temp, rh) {
+  if (temp < 12 || temp > 35 || rh < 45) return 0;
+  const tOpt = 22;
+  const rOpt = 68;
+  const tDelta = Math.max(0, 1 - Math.abs(temp - tOpt) / 12);
+  const rDelta = Math.max(0, 1 - Math.abs(rh - rOpt) / 30);
+  return Math.min(1, tDelta * rDelta * 1.15);
+}
+
 function getDegradationState(score) {
   if (score < 8)  return { label: 'Eccellente', color: '#4CAF50', emoji: '🟢', description: 'Conservazione ottimale' };
   if (score < 20) return { label: 'Buono',      color: '#8BC34A', emoji: '🟡', description: 'Lievi segni di invecchiamento' };
