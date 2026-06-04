@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Manoscritti · Voices of Heritage</title>
-<meta name="description" content="Caratteristiche e analisi conservativa dei codici beneventani della Biblioteca capitolare di Benevento (I-BV 21, 34, 37, 38, 39)." />
+<title>Simulatore · Voices of Heritage</title>
+<meta name="description" content="Simulatore grafico di un manoscritto beneventano ipotetico: avatar fotografico che si trasforma in funzione delle condizioni ambientali e del tempo." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -12,25 +12,22 @@
 </head>
 <body>
 
-<!-- TOP RED STRIP -->
 <div class="top-strip"></div>
 
-<!-- SITE HEADER -->
 <header class="site-header">
   <div class="site-logo">
     <img src="assets/logo-voh.png" alt="Voices of Heritage" />
   </div>
   <nav class="site-nav">
-    <a class="nav-link active" href="index.html">Manoscritti</a>
-    <a class="nav-link" href="simulatore.html">Simulatore</a>
+    <a class="nav-link" href="index.html">Manoscritti</a>
+    <a class="nav-link active" href="simulatore.html">Simulatore</a>
     <a class="nav-link" href="monitoring.html">Real Time Monitoring</a>
   </nav>
 </header>
 
-<!-- PAGE TITLE -->
 <div class="page-title-row">
   <div class="page-title">
-    <h2>Manoscritti</h2>
+    <h2>Simulatore</h2>
   </div>
   <div class="lang-switcher">
     <span class="lang-flag it" title="Italiano"></span>
@@ -39,31 +36,22 @@
 </div>
 <div class="page-divider"></div>
 
-<!-- ═══════════════ CATALOGO ═══════════════ -->
-<section class="full-section">
-  <div class="card">
-    <div class="card-head">
-      <h2>Catalogo dei codici beneventani</h2>
-      <span class="card-meta">5 manoscritti · Biblioteca capitolare di Benevento</span>
-    </div>
-    <div class="card-body">
-      <div class="ms-card-grid" id="manuGrid"><!-- injected by JS --></div>
-    </div>
-  </div>
-</section>
+<main class="layout">
 
-<!-- ═══════════════ SIMULAZIONE CONTROLS ═══════════════ -->
-<section class="full-section">
-  <div class="card sim-card">
+  <!-- ── STAGE / AVATAR ── -->
+  <section class="card stage">
     <div class="card-head">
-      <h2>Simulazione conservativa nel tempo</h2>
+      <h2>Avatar del manoscritto simulato</h2>
       <div class="stage-controls">
         <button id="btnReset" class="btn-ghost">⟲ Ripristina</button>
         <button id="btnPlay" class="btn-primary">▶ Simula nel tempo</button>
       </div>
     </div>
-    <div class="card-body">
-      <div class="kpi-strip">
+
+    <div class="stage-canvas" id="stage-canvas">
+      <span class="stage-tag" id="stage-tag">Caveau climatizzato</span>
+      <div id="book-container"></div>
+      <div class="overlay">
         <div class="kpi">
           <div class="kpi-label">Indice di degrado</div>
           <div class="kpi-value"><span id="kpiDamage">0</span><small>su 100</small></div>
@@ -76,30 +64,29 @@
           <div class="kpi-label">Anno simulato</div>
           <div class="kpi-value"><span id="kpiYear">0</span></div>
         </div>
-        <div class="kpi">
-          <div class="kpi-label">Stato</div>
-          <div class="kpi-value"><span id="statusText">Eccellente</span></div>
-        </div>
-      </div>
-      <div class="timeline">
-        <label for="timeSlider">Orizzonte temporale</label>
-        <input id="timeSlider" type="range" min="0" max="500" step="1" value="30" />
-        <output id="timeOut">30 anni</output>
       </div>
     </div>
-  </div>
-</section>
 
-<!-- ═══════════════ MAIN LAYOUT (single column) ═══════════════ -->
-<main class="layout single-col">
+    <div class="timeline">
+      <label for="timeSlider">Orizzonte temporale</label>
+      <input id="timeSlider" type="range" min="0" max="500" step="1" value="30" />
+      <output id="timeOut">30 anni</output>
+    </div>
+  </section>
 
+  <!-- ── DASHBOARD ── -->
   <aside class="card dashboard">
-    <div class="card-head"><h2>Analisi conservativa</h2></div>
+    <div class="card-head"><h2>Dashboard di controllo</h2></div>
 
     <fieldset>
-      <legend>Manoscritto selezionato</legend>
-      <label class="field">
-        <span>Sigla RISM</span>
+      <legend>Manoscritto simulato</legend>
+      <div class="hypothetical-note">
+        <strong>Codex Hypotheticus</strong> — manoscritto ipotetico, non esistente.
+        Codice beneventano di riferimento utilizzato per la simulazione grafica del
+        comportamento conservativo nel tempo al variare delle condizioni.
+      </div>
+      <label class="field" style="margin-top:10px">
+        <span>Codice di riferimento per il modello</span>
         <select id="selManuscript"></select>
       </label>
       <div class="manu-card" id="manuCard"></div>
@@ -213,7 +200,6 @@
   </aside>
 </main>
 
-<!-- BOTTOM SECTIONS -->
 <div class="full-section">
   <div class="card">
     <div class="card-head"><h2>Predizione del degrado nel tempo</h2></div>
@@ -252,13 +238,11 @@
   </div>
 </div>
 
-<!-- BRAND STRIP -->
 <div class="brand-strip">
   <img src="assets/logo-voh.png" alt="Voices of Heritage" />
   <p class="brand-strip-tag">Database del patrimonio manoscritto e musicale beneventano</p>
 </div>
 
-<!-- FOOTER -->
 <footer class="site-footer">
   <div class="footer-content">
     <div class="footer-brand">
@@ -271,9 +255,8 @@
       <a href="#">Cookie</a>
     </div>
     <div class="footer-meta">
-      Manoscritti beneventani della Biblioteca capitolare di Benevento
-      (I-BV 21, 34, 37, 38, 39). Modello didattico ispirato a ISO 11799,
-      moltiplicatore di Michalski e modello di Sedlbauer.
+      Simulatore grafico di un codice beneventano ipotetico. Modello didattico
+      ispirato a ISO 11799, moltiplicatore di Michalski e modello di Sedlbauer.
     </div>
   </div>
 </footer>

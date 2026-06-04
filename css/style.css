@@ -704,6 +704,324 @@ select option { background: #FFFFFF; color: var(--voh-text); }
   .seg-control button { padding: 6px 4px; }
 }
 
+/* ── MANUSCRIPT CARD GRID (Manoscritti page) ───────────────── */
+.ms-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+.ms-card {
+  background: var(--voh-bg);
+  border: 2px solid var(--voh-border);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  display: grid;
+  gap: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: all 0.15s;
+  box-shadow: var(--shadow-card);
+}
+.ms-card:hover {
+  border-color: var(--voh-red);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-h);
+}
+.ms-card.on {
+  border-color: var(--voh-red);
+  background: linear-gradient(180deg, rgba(168,37,62,0.06), rgba(168,37,62,0.02));
+}
+.ms-card-id {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--voh-red);
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid var(--voh-border-soft);
+  padding-bottom: 8px;
+  margin-bottom: 2px;
+}
+.ms-card-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  align-items: baseline;
+}
+.ms-card-k {
+  font-size: 0.66rem;
+  color: var(--voh-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+.ms-card-v {
+  font-size: 0.86rem;
+  color: var(--voh-text);
+  font-weight: 500;
+  text-align: right;
+}
+
+/* Card meta in card-head */
+.card-meta {
+  font-size: 0.78rem;
+  color: var(--voh-text-3);
+  font-style: italic;
+}
+
+/* ── KPI STRIP (Manoscritti page simulation card) ──────────── */
+.sim-card .card-body { padding: 18px 22px 6px; }
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.kpi-strip .kpi {
+  background: var(--voh-bg-soft);
+  border: 1px solid var(--voh-border-soft);
+  border-radius: var(--radius-card);
+  padding: 12px 14px;
+  box-shadow: none;
+}
+
+/* When .timeline lives inside a .card-body it must drop its own padding */
+.card-body > .timeline {
+  padding: 14px 0 0;
+  margin-top: 6px;
+}
+
+.single-col {
+  grid-template-columns: 1fr;
+}
+
+/* ── SIMULATOR PAGE: Hypothetical manuscript note ──────────── */
+.hypothetical-note {
+  padding: 12px 14px;
+  background: linear-gradient(180deg, rgba(168,37,62,0.07), rgba(168,37,62,0.02));
+  border: 1px solid var(--voh-red-light);
+  border-left: 3px solid var(--voh-red);
+  border-radius: var(--radius-card);
+  font-size: 0.85rem;
+  color: var(--voh-text-2);
+  line-height: 1.55;
+}
+.hypothetical-note strong { color: var(--voh-red); }
+
+/* ── REAL TIME MONITORING ──────────────────────────────────── */
+.mon-banner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: center;
+  padding: 20px 24px;
+}
+@media (max-width: 800px) {
+  .mon-banner { grid-template-columns: 1fr; }
+}
+.mon-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.mon-banner-left h2 { margin: 0; }
+.mon-live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--voh-red);
+  color: #FFFFFF;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.live-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  animation: live-pulse 1.4s infinite;
+}
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.45; transform: scale(0.7); }
+}
+.mon-banner-right { text-align: right; }
+.mon-status {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 0.92rem;
+  font-weight: 600;
+  border: 2px solid;
+  margin-bottom: 8px;
+}
+.mon-status.status-ok   { color: var(--voh-good); border-color: var(--voh-good); background: rgba(91,138,74,0.08); }
+.mon-status.status-warn { color: var(--voh-warn); border-color: var(--voh-warn); background: rgba(198,138,42,0.08); }
+.mon-status.status-bad  { color: var(--voh-bad);  border-color: var(--voh-bad);  background: rgba(196,69,54,0.08); animation: status-blink 1.5s infinite; }
+@keyframes status-blink {
+  0%, 100% { background: rgba(196,69,54,0.08); }
+  50%      { background: rgba(196,69,54,0.20); }
+}
+.mon-meta {
+  font-size: 0.78rem;
+  color: var(--voh-text-3);
+}
+.mon-meta b { color: var(--voh-text-2); font-weight: 600; }
+
+/* Monitoring config row */
+.mon-config {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 14px;
+  align-items: end;
+}
+@media (max-width: 750px) {
+  .mon-config { grid-template-columns: 1fr; }
+}
+.mon-action { display: flex; justify-content: flex-end; }
+
+/* Sensor grid */
+.sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+.sensor-card {
+  border: 1px solid var(--voh-border-soft);
+  border-radius: var(--radius-card);
+  padding: 14px;
+  background: var(--voh-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sensor-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.sensor-label {
+  font-size: 0.76rem;
+  color: var(--voh-text-2);
+  font-weight: 600;
+  line-height: 1.3;
+}
+.sensor-status {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid;
+  white-space: nowrap;
+}
+.sensor-status.status-ok   { color: var(--voh-good); border-color: var(--voh-good); background: rgba(91,138,74,0.08); }
+.sensor-status.status-warn { color: var(--voh-warn); border-color: var(--voh-warn); background: rgba(198,138,42,0.08); }
+.sensor-status.status-bad  { color: var(--voh-bad);  border-color: var(--voh-bad);  background: rgba(196,69,54,0.08); }
+.sensor-value {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--voh-text);
+  line-height: 1;
+}
+.sensor-value small {
+  font-size: 0.72rem;
+  color: var(--voh-text-3);
+  font-weight: 400;
+  margin-left: 4px;
+}
+.sensor-bar {
+  height: 6px;
+  background: var(--voh-bg-soft);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+.sensor-bar-fill {
+  height: 100%;
+  width: 0;
+  border-radius: var(--radius-pill);
+  transition: width 0.4s ease, background-color 0.3s ease;
+}
+.bar-ok   { background: var(--voh-good); }
+.bar-warn { background: var(--voh-warn); }
+.bar-bad  { background: var(--voh-bad); }
+.sensor-trend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--voh-text-3);
+}
+.trend-arrow {
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.trend-up   { color: var(--voh-bad); }
+.trend-down { color: var(--voh-good); }
+.trend-flat { color: var(--voh-text-3); }
+.trend-delta { font-family: 'Inter', monospace; font-weight: 600; }
+
+/* Monitoring grid (rate + chart + alerts) */
+.mon-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1.5fr;
+  gap: 22px;
+}
+@media (max-width: 1100px) { .mon-grid { grid-template-columns: 1fr; } }
+
+.deg-rate-big {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--voh-red);
+  line-height: 1;
+}
+.deg-rate-big small {
+  font-size: 0.85rem;
+  color: var(--voh-text-3);
+  margin-left: 6px;
+  font-weight: 500;
+}
+#liveChart {
+  display: block;
+  width: 100%;
+  height: 200px;
+  background: var(--voh-bg-soft);
+  border-radius: var(--radius-card);
+}
+
+/* Alert list */
+.alert-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.alert-list li {
+  padding: 10px 12px;
+  border-radius: var(--radius-card);
+  border-left: 3px solid var(--voh-border);
+  background: var(--voh-bg-soft);
+  font-size: 0.82rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+}
+.alert-list li.alert-warn { border-left-color: var(--voh-warn); }
+.alert-list li.alert-bad  { border-left-color: var(--voh-bad); background: rgba(196,69,54,0.06); }
+.alert-list li.alert-ok   { border-left-color: var(--voh-good); color: var(--voh-text-3); font-style: italic; }
+.alert-time {
+  font-family: 'Inter', monospace;
+  font-weight: 600;
+  color: var(--voh-text-3);
+  font-size: 0.74rem;
+}
+.alert-msg { color: var(--voh-text-2); }
+
 /* ── PREDICTION LIST ───────────────────────────────────────── */
 .prediction { background: var(--voh-bg-soft); }
 .pred-list {

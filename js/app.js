@@ -77,10 +77,12 @@ const state = {
 
 // ── Init ─────────────────────────────────────────────────────────────────────
 function init() {
-  initBookAvatar(document.getElementById('book-container'));
+  const bookContainer = document.getElementById('book-container');
+  if (bookContainer) initBookAvatar(bookContainer);
   initChart('degradation-chart');
 
   populateManuscripts();
+  populateManuscriptGrid();
   populateWeatherGrid();
   bindLocationButtons();
   bindSliders();
@@ -94,6 +96,7 @@ function init() {
 // ── Manoscritti ──────────────────────────────────────────────────────────────
 function populateManuscripts() {
   const sel = document.getElementById('selManuscript');
+  if (!sel) return;
   Object.values(MANUSCRIPTS).forEach(m => {
     const opt = document.createElement('option');
     opt.value = m.id;
@@ -102,6 +105,34 @@ function populateManuscripts() {
     sel.appendChild(opt);
   });
   sel.addEventListener('change', e => applyManuscript(e.target.value));
+}
+
+function populateManuscriptGrid() {
+  const grid = document.getElementById('manuGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  Object.values(MANUSCRIPTS).forEach(m => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = `ms-card${m.id === state.manuscript ? ' on' : ''}`;
+    card.dataset.id = m.id;
+    card.innerHTML = `
+      <span class="ms-card-id">${m.id}</span>
+      <span class="ms-card-row"><span class="ms-card-k">Datazione</span><span class="ms-card-v">${m.secolo}</span></span>
+      <span class="ms-card-row"><span class="ms-card-k">Età stimata</span><span class="ms-card-v">${m.ageYears} anni</span></span>
+      <span class="ms-card-row"><span class="ms-card-k">Supporto</span><span class="ms-card-v">${MATERIALS[m.support].name}</span></span>
+      <span class="ms-card-row"><span class="ms-card-k">Repositorio</span><span class="ms-card-v">Bibl. capitolare di Benevento</span></span>
+    `;
+    card.addEventListener('click', () => {
+      document.querySelectorAll('#manuGrid .ms-card').forEach(c => c.classList.remove('on'));
+      card.classList.add('on');
+      // Sync the dropdown if present
+      const sel = document.getElementById('selManuscript');
+      if (sel) sel.value = m.id;
+      applyManuscript(m.id);
+    });
+    grid.appendChild(card);
+  });
 }
 
 function applyManuscript(id) {
@@ -113,8 +144,16 @@ function applyManuscript(id) {
   state.material = m.support;
   rebuildBookAvatar(state.material);
 
+  // Keep grid and dropdown in sync
+  document.querySelectorAll('#manuGrid .ms-card').forEach(c => {
+    c.classList.toggle('on', c.dataset.id === id);
+  });
+  const sel = document.getElementById('selManuscript');
+  if (sel && sel.value !== id) sel.value = id;
+
   // Render manuscript card (VoH layout: pairs of label/value with red bullets)
   const card = document.getElementById('manuCard');
+  if (!card) { update(); return; }
   card.innerHTML = `
     <div class="manu-row">
       <div>
@@ -207,50 +246,59 @@ function bindSliders() {
 
 // ── Time controls ────────────────────────────────────────────────────────────
 function bindTimeControls() {
-  document.getElementById('btnPlay').addEventListener('click', toggleAnimation);
-  document.getElementById('btnReset').addEventListener('click', resetTime);
+  const play  = document.getElementById('btnPlay');
+  const reset = document.getElementById('btnReset');
+  if (play)  play.addEventListener('click', toggleAnimation);
+  if (reset) reset.addEventListener('click', resetTime);
+}
+
+function setPlayBtn(playing) {
+  const btn = document.getElementById('btnPlay');
+  if (!btn) return;
+  btn.classList.toggle('playing', playing);
+  btn.textContent = playing ? '⏸ Pausa' : '▶ Simula nel tempo';
+}
+
+function syncTimeWidgets() {
+  const ts = document.getElementById('timeSlider');
+  const to = document.getElementById('timeOut');
+  if (ts) ts.value = state.years;
+  if (to) to.textContent = Math.round(state.years) + ' anni';
 }
 
 function toggleAnimation() {
-  const btn = document.getElementById('btnPlay');
   if (state.animTimer) {
     clearInterval(state.animTimer);
     state.animTimer = null;
-    btn.classList.remove('playing');
-    btn.textContent = '▶ Simula nel tempo';
+    setPlayBtn(false);
     return;
   }
-  btn.classList.add('playing');
-  btn.textContent = '⏸ Pausa';
+  setPlayBtn(true);
   state.years = 0;
   state.animTimer = setInterval(() => {
     state.years += 2;
     if (state.years > 200) {
       clearInterval(state.animTimer);
       state.animTimer = null;
-      btn.classList.remove('playing');
-      btn.textContent = '▶ Simula nel tempo';
+      setPlayBtn(false);
     }
-    document.getElementById('timeSlider').value = state.years;
-    document.getElementById('timeOut').textContent = Math.round(state.years) + ' anni';
+    syncTimeWidgets();
     update();
   }, 90);
 }
 
 function resetTime() {
   if (state.animTimer) { clearInterval(state.animTimer); state.animTimer = null; }
-  const btn = document.getElementById('btnPlay');
-  btn.classList.remove('playing');
-  btn.textContent = '▶ Simula nel tempo';
+  setPlayBtn(false);
   state.years = 0;
-  document.getElementById('timeSlider').value = 0;
-  document.getElementById('timeOut').textContent = '0 anni';
+  syncTimeWidgets();
   update();
 }
 
 // ── Weather ──────────────────────────────────────────────────────────────────
 function populateWeatherGrid() {
   const grid = document.getElementById('weather-grid');
+  if (!grid) return;
   Object.values(WEATHER).forEach(w => {
     const btn = document.createElement('button');
     btn.className = `weather-btn${w.id === state.weather ? ' active' : ''}`;
@@ -303,17 +351,24 @@ function update() {
   updateStatusChip();
 
   // Update KPI overlay
-  document.getElementById('kpiDamage').textContent = state.score.toFixed(1);
-  document.getElementById('kpiYear').textContent   = Math.round(state.years);
-  const life = yearsToThreshold(conditions, state.material, 75);
-  document.getElementById('kpiLife').textContent =
-    !isFinite(life) || life > 9999 ? '> 9999' : life > 999 ? '> 999' : Math.round(life);
+  const kpiDmg  = document.getElementById('kpiDamage');
+  const kpiYr   = document.getElementById('kpiYear');
+  const kpiLife = document.getElementById('kpiLife');
+  if (kpiDmg) kpiDmg.textContent = state.score.toFixed(1);
+  if (kpiYr)  kpiYr.textContent  = Math.round(state.years);
+  if (kpiLife) {
+    const life = yearsToThreshold(conditions, state.material, 75);
+    kpiLife.textContent =
+      !isFinite(life) || life > 9999 ? '> 9999' : life > 999 ? '> 999' : Math.round(life);
+  }
 
   // Update manuscript state badges
   updateManuscriptStateBadges();
 
-  // Update book avatar
-  updateBookAvatar(state.score, conditions, state.material);
+  // Update book avatar (only on simulator page)
+  if (document.getElementById('book-container')) {
+    updateBookAvatar(state.score, conditions, state.material);
+  }
 
   // Update chart
   const fullProj = projectDegradation(conditions, state.material, state.projectionYears);
@@ -409,7 +464,7 @@ function updateStatusChip() {
   else if (state.score > 20) cls = 'warn';
 
   if (dot) { dot.classList.remove('warn', 'bad'); if (cls !== 'good') dot.classList.add(cls); }
-  if (txt) txt.textContent = `${ds.label} — degrado ${state.score.toFixed(1)}%`;
+  if (txt) txt.textContent = ds.label;
 }
 
 function updateManuscriptStateBadges() {

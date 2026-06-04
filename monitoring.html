@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Real Time Monitoring · Voices of Heritage</title>
+<meta name="description" content="Monitoraggio in tempo reale dei parametri ambientali e degli inquinanti che governano la conservazione dei manoscritti beneventani: T, UR, lux, SO₂, NOₓ, O₃, CO₂, PM2.5." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="top-strip"></div>
+
+<header class="site-header">
+  <div class="site-logo">
+    <img src="assets/logo-voh.png" alt="Voices of Heritage" />
+  </div>
+  <nav class="site-nav">
+    <a class="nav-link" href="index.html">Manoscritti</a>
+    <a class="nav-link" href="simulatore.html">Simulatore</a>
+    <a class="nav-link active" href="monitoring.html">Real Time Monitoring</a>
+  </nav>
+</header>
+
+<div class="page-title-row">
+  <div class="page-title">
+    <h2>Real Time Monitoring</h2>
+  </div>
+  <div class="lang-switcher">
+    <span class="lang-flag it" title="Italiano"></span>
+    <span class="lang-flag en" title="English"></span>
+  </div>
+</div>
+<div class="page-divider"></div>
+
+<!-- ═══════════════ STATUS BANNER ═══════════════ -->
+<section class="full-section">
+  <div class="card mon-banner">
+    <div class="mon-banner-left">
+      <div class="mon-live">
+        <span class="live-dot"></span>
+        <span>LIVE</span>
+      </div>
+      <div>
+        <h2 id="locDisplayName">Caveau climatizzato</h2>
+        <p id="locDisplayDesc" class="hint" style="margin-top:4px">—</p>
+      </div>
+    </div>
+    <div class="mon-banner-right">
+      <div class="mon-status status-ok" id="overallStatus">Tutti i sensori entro i limiti ISO 11799</div>
+      <div class="mon-meta">
+        <span>Ultima lettura: <b id="lastReading">—</b></span>
+        <span>·</span>
+        <span><b id="uptimeSamples">0 campioni</b></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ CONFIG ═══════════════ -->
+<section class="full-section">
+  <div class="card">
+    <div class="card-head"><h2>Configurazione monitoraggio</h2></div>
+    <div class="card-body mon-config">
+      <label>Manoscritto monitorato
+        <select id="monManuscript"></select>
+      </label>
+      <label>Locazione fisica
+        <select id="monLocation"></select>
+      </label>
+      <div class="mon-action">
+        <button class="btn-outline" id="btnIncident">⚠ Simula incidente ambientale</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SENSOR GRID ═══════════════ -->
+<section class="full-section">
+  <div class="card">
+    <div class="card-head">
+      <h2>Sensori ambientali</h2>
+      <span class="card-meta">8 canali · aggiornamento ogni 2.5 s</span>
+    </div>
+    <div class="card-body">
+      <div class="sensor-grid" id="sensorGrid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ RATE + CHART + ALERTS ═══════════════ -->
+<section class="full-section">
+  <div class="mon-grid">
+    <div class="card">
+      <div class="card-head"><h2>Tasso di degrado istantaneo</h2></div>
+      <div class="card-body">
+        <div class="deg-rate-big">
+          <span id="degRateValue">0.000</span><small>%/anno</small>
+        </div>
+        <p class="hint">Moltiplicatore vs. condizioni ottimali: <b id="degRateMult">1.00×</b></p>
+        <p class="hint" style="margin-top:8px">
+          Calcolato dal modello di Arrhenius applicato alle letture correnti di temperatura,
+          umidità, illuminamento e inquinanti.
+        </p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>Andamento ultimi 60 campioni</h2></div>
+      <div class="card-body">
+        <canvas id="liveChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card mon-alerts">
+      <div class="card-head"><h2>Eventi e allarmi</h2></div>
+      <div class="card-body">
+        <ul class="alert-list" id="alertList">
+          <li class="alert-ok"><span class="alert-msg">In attesa del primo campione…</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ISO REFERENCE ═══════════════ -->
+<section class="full-section">
+  <div class="card">
+    <div class="card-head"><h2>Soglie di riferimento</h2></div>
+    <div class="card-body">
+      <table class="ref-table">
+        <thead>
+          <tr><th>Sensore</th><th>Range ottimale</th><th>Soglia allerta</th><th>Soglia critica</th><th>Norma</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Temperatura</td><td>14–22 °C</td><td>&lt; 14 / &gt; 22 °C</td><td>&lt; 12 / &gt; 24 °C</td><td>ISO 11799</td></tr>
+          <tr><td>Umidità relativa</td><td>45–55 %</td><td>&lt; 45 / &gt; 55 %</td><td>&lt; 30 / &gt; 65 %</td><td>ISO 11799</td></tr>
+          <tr><td>Illuminamento</td><td>≤ 50 lux</td><td>50–200 lux</td><td>&gt; 200 lux</td><td>AICCM</td></tr>
+          <tr><td>SO₂</td><td>≤ 1 µg/m³</td><td>1–3 µg/m³</td><td>&gt; 3 µg/m³</td><td>UNI 10829</td></tr>
+          <tr><td>NOₓ</td><td>≤ 2 µg/m³</td><td>2–5 µg/m³</td><td>&gt; 5 µg/m³</td><td>UNI 10829</td></tr>
+          <tr><td>O₃</td><td>≤ 2 µg/m³</td><td>2–5 µg/m³</td><td>&gt; 5 µg/m³</td><td>UNI 10829</td></tr>
+          <tr><td>CO₂</td><td>≤ 1000 ppm</td><td>1000–1500 ppm</td><td>&gt; 1500 ppm</td><td>UNI EN 16242</td></tr>
+          <tr><td>PM2.5</td><td>≤ 15 µg/m³</td><td>15–35 µg/m³</td><td>&gt; 35 µg/m³</td><td>WHO 2021</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="brand-strip">
+  <img src="assets/logo-voh.png" alt="Voices of Heritage" />
+  <p class="brand-strip-tag">Database del patrimonio manoscritto e musicale beneventano</p>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-content">
+    <div class="footer-brand">
+      <img src="assets/logo-voh.png" alt="Voices of Heritage" />
+      <p>Voice of Heritage</p>
+    </div>
+    <div class="footer-legal">
+      <h4>Informazioni legali</h4>
+      <a href="#">Privacy</a>
+      <a href="#">Cookie</a>
+    </div>
+    <div class="footer-meta">
+      Real Time Monitoring · soglie di riferimento ISO 11799, AICCM,
+      UNI 10829, UNI EN 16242 e WHO 2021. I dati visualizzati sono simulati a
+      scopo didattico.
+    </div>
+  </div>
+</footer>
+
+<script src="js/model.js"></script>
+<script src="js/monitoring.js"></script>
+</body>
+</html>
