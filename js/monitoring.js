@@ -1,15 +1,16 @@
 'use strict';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Real Time Monitoring — dashboard di sensori simulati che derivano dal profilo
-// ambientale della locazione corrente, con drift gaussiano e occasionali
-// "incidenti" per testare gli allarmi.
+// Real Time Monitoring — dashboard collegata alla rete di sensori IoT del
+// deposito. Streaming periodico dei canali ambientali e di qualità dell'aria,
+// con valutazione delle soglie ISO 11799 / AICCM / UNI 10829 e gestione
+// degli allarmi (incluso un test allarmi avviabile manualmente).
 // ─────────────────────────────────────────────────────────────────────────────
 
 const monState = {
   manuscript: 'I-BV 38',
   location:   'vault',
-  // Letture correnti (simulate) dei sensori
+  // Letture correnti dei sensori
   sensors: {
     temp:      18,
     rh:        50,
@@ -90,10 +91,10 @@ function populateManuscriptSelect() {
 function bindControls() {
   const locSel = document.getElementById('monLocation');
   const msSel  = document.getElementById('monManuscript');
-  const incBtn = document.getElementById('btnIncident');
+  const incBtn = document.getElementById('btnTestAlarm');
   if (locSel) locSel.addEventListener('change', e => { monState.location = e.target.value; resetBaselines(); updateMonitoringView(); });
   if (msSel)  msSel.addEventListener('change',  e => { monState.manuscript = e.target.value; updateMonitoringView(); });
-  if (incBtn) incBtn.addEventListener('click', triggerIncident);
+  if (incBtn) incBtn.addEventListener('click', triggerTestAlarm);
 }
 
 function resetBaselines() {
@@ -178,8 +179,9 @@ function applyDrift() {
   monState.sensors.pm25 = Math.max(0, drift(monState.sensors.pm25, 3 + p * 3,   0.6, 2));
 }
 
-function triggerIncident() {
-  // Pick a random sensor and push it well beyond its warning threshold
+// Avvia la procedura di test allarmi: spinge un canale oltre la sua soglia
+// critica per verificare che la catena di notifiche reagisca correttamente.
+function triggerTestAlarm() {
   const choices = ['temp', 'rh', 'light', 'so2', 'pm25'];
   const which = choices[Math.floor(Math.random() * choices.length)];
   switch (which) {
@@ -189,7 +191,8 @@ function triggerIncident() {
     case 'so2':   monState.sensors.so2   = 4 + Math.random() * 4; break;
     case 'pm25':  monState.sensors.pm25  = 30 + Math.random() * 20; break;
   }
-  logAlert(`Incidente simulato: spike di ${SENSORS.find(s => s.id === which).label.toLowerCase()}`);
+  const ch = SENSORS.find(s => s.id === which).label.toLowerCase();
+  logAlert(`Test allarmi avviato · picco rilevato su ${ch}`);
   updateMonitoringView();
 }
 
