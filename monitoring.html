@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
+<body data-page="monitoring">
 
 <div class="top-strip"></div>
 
@@ -73,6 +73,29 @@
       </label>
       <div class="mon-action">
         <button class="btn-outline" id="btnIncident">⚠ Simula incidente ambientale</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ CURVA DI USURA ═══════════════ -->
+<section class="full-section">
+  <div class="card">
+    <div class="card-head">
+      <h2>Curva di usura del manoscritto</h2>
+      <span class="card-meta" id="wearManuLabel">—</span>
+    </div>
+    <div class="card-body">
+      <p class="section-intro">
+        Andamento del <strong>grado di usura</strong> del codice selezionato in funzione dei
+        parametri ambientali rilevati in tempo reale. La curva parte dalla nascita del manoscritto,
+        attraversa l'età attuale (linea <span style="color:#A8253E;font-weight:600">«oggi»</span>)
+        e proietta il degrado futuro mantenendo le condizioni correnti: peggiorando T, UR o
+        inquinanti la pendenza futura si impenna.
+      </p>
+      <div class="wear-layout">
+        <div class="wear-info" id="wearInfo"></div>
+        <canvas id="wearChart"></canvas>
       </div>
     </div>
   </div>

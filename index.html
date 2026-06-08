@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
+<body data-page="manoscritti">
 
 <!-- TOP RED STRIP -->
 <div class="top-strip"></div>
@@ -56,13 +56,22 @@
 <section class="full-section">
   <div class="card sim-card">
     <div class="card-head">
-      <h2>Simulazione conservativa nel tempo</h2>
+      <div>
+        <h2>Simulazione conservativa nel tempo</h2>
+        <span class="card-meta" id="simManuscriptLabel"></span>
+      </div>
       <div class="stage-controls">
         <button id="btnReset" class="btn-ghost">⟲ Ripristina</button>
         <button id="btnPlay" class="btn-primary">▶ Simula nel tempo</button>
       </div>
     </div>
     <div class="card-body">
+      <p class="section-intro">
+        La simulazione parte dall'<strong>età reale del codice selezionato</strong> (il degrado
+        già accumulato in secoli di vita) e proietta in avanti l'<em>orizzonte temporale</em>
+        scelto, nelle condizioni ambientali impostate qui sotto. Cambiando manoscritto cambiano
+        età, indice di degrado e vita residua.
+      </p>
       <div class="kpi-strip">
         <div class="kpi">
           <div class="kpi-label">Indice di degrado</div>
@@ -73,8 +82,8 @@
           <div class="kpi-value"><span id="kpiLife">∞</span><small>anni</small></div>
         </div>
         <div class="kpi">
-          <div class="kpi-label">Anno simulato</div>
-          <div class="kpi-value"><span id="kpiYear">0</span></div>
+          <div class="kpi-label">Età simulata</div>
+          <div class="kpi-value"><span id="kpiYear">0</span><small>anni</small></div>
         </div>
         <div class="kpi">
           <div class="kpi-label">Stato</div>
@@ -82,7 +91,7 @@
         </div>
       </div>
       <div class="timeline">
-        <label for="timeSlider">Orizzonte temporale</label>
+        <label for="timeSlider">Orizzonte temporale (proiezione futura)</label>
         <input id="timeSlider" type="range" min="0" max="500" step="1" value="30" />
         <output id="timeOut">30 anni</output>
       </div>
@@ -221,33 +230,21 @@
       <canvas id="degradation-chart"></canvas>
     </div>
   </div>
-  <div class="section-grid">
-    <div class="card">
-      <div class="card-head"><h2>Previsioni di degrado critico</h2></div>
-      <div class="card-body">
-        <div id="thresholds-container"></div>
-        <p class="hint" style="margin-top:14px">
-          Stime basate su modello di Arrhenius, isoperms ISO 11799, moltiplicatore di Michalski
-          e modello fungino di Sedlbauer.
-        </p>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-head"><h2>Riferimento materiali</h2></div>
-      <div class="card-body">
-        <table class="ref-table">
-          <thead>
-            <tr><th>Materiale</th><th>T ott.</th><th>UR ott.</th><th>Luce</th><th>Inquin.</th><th>Rischio</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Pergamena</td><td>18°C</td><td>45–55%</td><td><span class="star">★★★</span></td><td><span class="star">★★★</span></td><td>Cockling, idrolisi del collagene</td></tr>
-            <tr><td>Vellum</td><td>17°C</td><td>44–54%</td><td><span class="star">★★★★</span></td><td><span class="star">★★★</span></td><td>Sbiadimento miniature</td></tr>
-            <tr><td>Papiro</td><td>20°C</td><td>40–55%</td><td><span class="star">★★★★★</span></td><td><span class="star">★★</span></td><td>Fragilità, delamellazione</td></tr>
-            <tr><td>Cuoio</td><td>18°C</td><td>45–55%</td><td><span class="star">★★</span></td><td><span class="star">★★★★★</span></td><td>Red rot (SO₂)</td></tr>
-            <tr><td>Tavoletta cerata</td><td>15°C</td><td>40–55%</td><td><span class="star">★</span></td><td><span class="star">★</span></td><td>Fusione cera &gt; 25°C</td></tr>
-          </tbody>
-        </table>
-      </div>
+  <div class="card">
+    <div class="card-head"><h2>Previsioni di degrado critico</h2></div>
+    <div class="card-body">
+      <p class="section-intro">
+        Le soglie indicano <strong>quando</strong> il manoscritto raggiungerà ciascun livello
+        di degrado nelle condizioni ambientali attuali, e <strong>come intervenire</strong> a
+        ogni stadio. I tempi sono calcolati a partire dall'età corrente del codice: i livelli
+        contrassegnati come <em>«già raggiunto»</em> riflettono il degrado fisiologico maturato
+        nei secoli. Stime ispirate al modello di Arrhenius, alle <em>isoperms</em> di ISO 11799,
+        al moltiplicatore di vita di Michalski e al modello fungino di Sedlbauer.
+      </p>
+      <div id="thresholds-container"></div>
+      <p class="hint" style="margin-top:14px">
+        Modello didattico: non sostituisce la diagnosi di un conservatore-restauratore.
+      </p>
     </div>
   </div>
 </div>

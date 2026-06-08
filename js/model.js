@@ -390,6 +390,42 @@ function getBrimblecombeInsectRisk(temp, rh) {
   return Math.min(1, tDelta * rDelta * 1.15);
 }
 
+// ── Manoscritti della Biblioteca capitolare di Benevento ──────────────────────
+// Definiti qui (model.js) così da essere condivisi da tutte le pagine
+// (Manoscritti, Simulatore, Real Time Monitoring).
+const MANUSCRIPTS = {
+  'I-BV 21': {
+    id: 'I-BV 21', rism: 'I-BV 21', secolo: 'XII (1101–1200)', centuryNum: 12,
+    ageYears: 876, repo: 'Biblioteca capitolare di Benevento', support: 'parchment',
+    note: 'Codice beneventano del XII secolo. Pergamena con notazione musicale beneventana; legatura medievale.',
+    inks: 'Inchiostro ferro-gallico (acido)'
+  },
+  'I-BV 34': {
+    id: 'I-BV 34', rism: 'I-BV 34', secolo: 'XII (1101–1200)', centuryNum: 12,
+    ageYears: 876, repo: 'Biblioteca capitolare di Benevento', support: 'parchment',
+    note: 'Manoscritto liturgico-musicale beneventano del XII secolo. Pergamena di pecora con miniature.',
+    inks: 'Ferro-gallico, pigmenti minerali'
+  },
+  'I-BV 37': {
+    id: 'I-BV 37', rism: 'I-BV 37', secolo: 'XI (1001–1100)', centuryNum: 11,
+    ageYears: 976, repo: 'Biblioteca capitolare di Benevento', support: 'parchment',
+    note: 'Codice dell\'XI secolo, testimone della tradizione scrittoria beneventana. Pergamena fine.',
+    inks: 'Ferro-gallico'
+  },
+  'I-BV 38': {
+    id: 'I-BV 38', rism: 'I-BV 38', secolo: 'XI (1001–1100)', centuryNum: 11,
+    ageYears: 976, repo: 'Biblioteca capitolare di Benevento', support: 'parchment',
+    note: 'Antico codice liturgico beneventano dell\'XI secolo. Importante testimone della notazione musicale ante-Guido d\'Arezzo.',
+    inks: 'Ferro-gallico, oro per le iniziali'
+  },
+  'I-BV 39': {
+    id: 'I-BV 39', rism: 'I-BV 39', secolo: 'XI (1001–1100)', centuryNum: 11,
+    ageYears: 976, repo: 'Biblioteca capitolare di Benevento', support: 'parchment',
+    note: 'Manoscritto musicale dell\'XI secolo della scuola beneventana. Pergamena di pecora, legatura rifatta.',
+    inks: 'Ferro-gallico'
+  }
+};
+
 function getDegradationState(score) {
   if (score < 8)  return { label: 'Eccellente', color: '#4CAF50', emoji: '🟢', description: 'Conservazione ottimale' };
   if (score < 20) return { label: 'Buono',      color: '#8BC34A', emoji: '🟡', description: 'Lievi segni di invecchiamento' };

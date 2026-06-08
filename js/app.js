@@ -1,63 +1,6 @@
 'use strict';
 
-// ── Manoscritti della Biblioteca capitolare di Benevento ──────────────────────
-const MANUSCRIPTS = {
-  'I-BV 21': {
-    id: 'I-BV 21',
-    rism: 'I-BV 21',
-    secolo: 'XII (1101–1200)',
-    centuryNum: 12,
-    ageYears: 876, // calcolato su anno 2026, datazione ~1150
-    repo: 'Biblioteca Capitolare di Benevento',
-    support: 'parchment',
-    note: 'Codice beneventano del XII secolo. Pergamena con notazione musicale beneventana; legatura medievale.',
-    inks: 'Inchiostro ferro-gallico (acido)'
-  },
-  'I-BV 34': {
-    id: 'I-BV 34',
-    rism: 'I-BV 34',
-    secolo: 'XII (1101–1200)',
-    centuryNum: 12,
-    ageYears: 876,
-    repo: 'Biblioteca capitolare di Benevento',
-    support: 'parchment',
-    note: 'Manoscritto liturgico-musicale beneventano del XII secolo. Pergamena di pecora con miniature.',
-    inks: 'Ferro-gallico, pigmenti minerali'
-  },
-  'I-BV 37': {
-    id: 'I-BV 37',
-    rism: 'I-BV 37',
-    secolo: 'XI (1001–1100)',
-    centuryNum: 11,
-    ageYears: 976,
-    repo: 'Biblioteca capitolare di Benevento',
-    support: 'parchment',
-    note: 'Codice dell\'XI secolo, testimone della tradizione scrittoria beneventana. Pergamena fine.',
-    inks: 'Ferro-gallico'
-  },
-  'I-BV 38': {
-    id: 'I-BV 38',
-    rism: 'I-BV 38',
-    secolo: 'XI (1001–1100)',
-    centuryNum: 11,
-    ageYears: 976,
-    repo: 'Biblioteca capitolare di Benevento',
-    support: 'parchment',
-    note: 'Antico codice liturgico beneventano dell\'XI secolo. Importante testimone della notazione musicale ante-Guido d\'Arezzo.',
-    inks: 'Ferro-gallico, oro per le iniziali'
-  },
-  'I-BV 39': {
-    id: 'I-BV 39',
-    rism: 'I-BV 39',
-    secolo: 'XI (1001–1100)',
-    centuryNum: 11,
-    ageYears: 976,
-    repo: 'Biblioteca capitolare di Benevento',
-    support: 'parchment',
-    note: 'Manoscritto musicale dell\'XI secolo della scuola beneventana. Pergamena di pecora, legatura rifatta.',
-    inks: 'Ferro-gallico'
-  }
-};
+// MANUSCRIPTS è definito in model.js (condiviso fra tutte le pagine).
 
 // ── App state ────────────────────────────────────────────────────────────────
 const state = {
@@ -77,6 +20,10 @@ const state = {
 
 // ── Init ─────────────────────────────────────────────────────────────────────
 function init() {
+  // Page identity: 'manoscritti' (real aged codices) | 'simulatore' (fresh
+  // simulated book) — drives whether the manuscript age is used as baseline.
+  state.page = (document.body && document.body.dataset.page) || 'simulatore';
+
   const bookContainer = document.getElementById('book-container');
   if (bookContainer) initBookAvatar(bookContainer);
   initChart('degradation-chart');
@@ -91,6 +38,22 @@ function init() {
   applyManuscript(state.manuscript);
   updateStageAtmosphere();
   update();
+}
+
+// On the Manoscritti page the selected real codex carries its own age, so the
+// degradation already accumulated over its centuries of life becomes the
+// baseline. On the Simulatore page the book is a fresh, hypothetical volume
+// (baseline age = 0) that we watch degrade from new.
+function getBaselineAge() {
+  if (state.page === 'manoscritti') {
+    const m = MANUSCRIPTS[state.manuscript];
+    return m ? m.ageYears : 0;
+  }
+  return 0;
+}
+
+function getEffectiveYears() {
+  return getBaselineAge() + state.years;
 }
 
 // ── Manoscritti ──────────────────────────────────────────────────────────────
@@ -118,10 +81,17 @@ function populateManuscriptGrid() {
     card.dataset.id = m.id;
     card.innerHTML = `
       <span class="ms-card-id">${m.id}</span>
-      <span class="ms-card-row"><span class="ms-card-k">Datazione</span><span class="ms-card-v">${m.secolo}</span></span>
-      <span class="ms-card-row"><span class="ms-card-k">Età stimata</span><span class="ms-card-v">${m.ageYears} anni</span></span>
-      <span class="ms-card-row"><span class="ms-card-k">Supporto</span><span class="ms-card-v">${MATERIALS[m.support].name}</span></span>
-      <span class="ms-card-row"><span class="ms-card-k">Repositorio</span><span class="ms-card-v">Bibl. capitolare di Benevento</span></span>
+      <span class="ms-card-sub">${m.secolo} · ${MATERIALS[m.support].name}</span>
+      <span class="ms-card-rows">
+        <span class="ms-card-row"><span class="ms-card-k">Identificativo RISM</span><span class="ms-card-v">${m.rism}</span></span>
+        <span class="ms-card-row"><span class="ms-card-k">Datazione</span><span class="ms-card-v">${m.secolo}</span></span>
+        <span class="ms-card-row"><span class="ms-card-k">Età stimata</span><span class="ms-card-v">${m.ageYears} anni</span></span>
+        <span class="ms-card-row"><span class="ms-card-k">Supporto</span><span class="ms-card-v">${MATERIALS[m.support].name}</span></span>
+        <span class="ms-card-row"><span class="ms-card-k">Inchiostri</span><span class="ms-card-v">${m.inks}</span></span>
+        <span class="ms-card-row"><span class="ms-card-k">Repositorio</span><span class="ms-card-v">${m.repo}</span></span>
+      </span>
+      <span class="ms-card-note">${m.note}</span>
+      <span class="ms-card-cta">Seleziona per la simulazione →</span>
     `;
     card.addEventListener('click', () => {
       document.querySelectorAll('#manuGrid .ms-card').forEach(c => c.classList.remove('on'));
@@ -343,23 +313,37 @@ function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
 function update() {
   const conditions = { temp: state.temp, rh: state.rh, light: state.light, pollution: state.pollution };
 
-  // Compute score at the current simulation year
-  const proj = projectDegradation(conditions, state.material, Math.max(state.years, 1));
+  // Effective exposure = manuscript age (baseline) + projection horizon.
+  // This is what makes the simulation depend on the selected codex.
+  const baseAge  = getBaselineAge();
+  const effYears = baseAge + state.years;
+
+  const proj = projectDegradation(conditions, state.material, Math.max(effYears, 1));
   state.score = proj[proj.length - 1].score;
 
   // Update status chip in topbar
   updateStatusChip();
 
-  // Update KPI overlay
+  // Update KPIs
   const kpiDmg  = document.getElementById('kpiDamage');
   const kpiYr   = document.getElementById('kpiYear');
   const kpiLife = document.getElementById('kpiLife');
   if (kpiDmg) kpiDmg.textContent = state.score.toFixed(1);
-  if (kpiYr)  kpiYr.textContent  = Math.round(state.years);
+  if (kpiYr)  kpiYr.textContent  = Math.round(state.page === 'manoscritti' ? effYears : state.years);
   if (kpiLife) {
-    const life = yearsToThreshold(conditions, state.material, 75);
+    const t75      = yearsToThreshold(conditions, state.material, 75);
+    const residual = isFinite(t75) ? Math.max(0, t75 - effYears) : Infinity;
     kpiLife.textContent =
-      !isFinite(life) || life > 9999 ? '> 9999' : life > 999 ? '> 999' : Math.round(life);
+      !isFinite(residual) || residual > 9999 ? '> 9999' : residual > 999 ? '> 999' : Math.round(residual);
+  }
+
+  // Manuscript label on the simulation card (Manoscritti page)
+  const simLbl = document.getElementById('simManuscriptLabel');
+  if (simLbl) {
+    const m = MANUSCRIPTS[state.manuscript];
+    simLbl.textContent = m
+      ? `${m.id} · ${m.ageYears} anni · ${MATERIALS[m.support].name}`
+      : '';
   }
 
   // Update manuscript state badges
@@ -370,9 +354,11 @@ function update() {
     updateBookAvatar(state.score, conditions, state.material);
   }
 
-  // Update chart
-  const fullProj = projectDegradation(conditions, state.material, state.projectionYears);
-  drawDegradationChart(fullProj, state.years, state.material);
+  // Update chart — span the full life of the volume so the current position
+  // (the vertical marker) always sits within the plotted range.
+  const chartSpan = baseAge + Math.max(state.projectionYears, state.years + 20);
+  const fullProj  = projectDegradation(conditions, state.material, chartSpan);
+  drawDegradationChart(fullProj, effYears, state.material);
 
   // Update material/structural risk factors
   renderChemicalGauge(conditions);
@@ -509,23 +495,60 @@ function renderPredictions(conditions) {
   list.innerHTML = items.join('');
 }
 
+// Per-level meaning + recommended conservation strategy
+const THRESHOLD_INFO = [
+  {
+    pct: 25, label: 'Degrado minore', color: '#C68A2A',
+    meaning: 'Primi segni di invecchiamento: lieve ingiallimento e modeste variazioni cromatiche. Il supporto è ancora flessibile e il testo perfettamente leggibile. Nessun danno strutturale.',
+    action: 'Monitoraggio ambientale di routine. Mantenere T 16–18 °C e UR 50 ± 5 %, illuminamento ≤ 50 lux con filtri UV. Custodia in contenitori conservativi a pH neutro, spolveratura controllata. Nessun intervento di restauro necessario.'
+  },
+  {
+    pct: 50, label: 'Degrado moderato', color: '#E0852A',
+    meaning: 'Degrado visibile: ingiallimento diffuso, comparsa di foxing, irrigidimento e deformazione (cockling) della pergamena, fragilità ai margini. La leggibilità inizia a essere localmente compromessa.',
+    action: 'Intervento conservativo programmato. Stabilizzare con urgenza il microclima e ridurre luce e inquinanti. Far valutare il volume da un conservatore-restauratore e digitalizzarlo per limitarne la manipolazione diretta.'
+  },
+  {
+    pct: 75, label: 'Degrado grave', color: '#C44536',
+    meaning: 'Danno strutturale significativo: lacerazioni, perdita di materia, distacco di strati, corrosione del supporto da parte dell\'inchiostro ferro-gallico e alterazioni cromatiche marcate. Leggibilità compromessa in più punti.',
+    action: 'Restauro urgente in laboratorio specializzato: deacidificazione e consolidamento del supporto, trattamento dell\'inchiostro ferro-gallico (es. fitato di calcio), eventuale velatura. Conservazione in atmosfera controllata; accesso consentito solo tramite riproduzione digitale.'
+  },
+  {
+    pct: 90, label: 'Perdita quasi totale', color: '#7A2F9E',
+    meaning: 'Perdita irreversibile imminente: disgregazione del supporto, ampie lacune, mineralizzazione e testo in gran parte illeggibile. Il manufatto rischia la perdita definitiva.',
+    action: 'Misure d\'emergenza. Isolamento in microclima inerte (teca anossica o atmosfera modificata), manipolazione vietata, documentazione fotografica e digitale completa e immediata. Intervento di un\'équipe di restauro d\'urgenza con eventuale incapsulamento dei frammenti.'
+  }
+];
+
 function renderThresholds(conditions) {
   const cont = document.getElementById('thresholds-container');
   if (!cont) return;
-  const thresholds = [
-    { pct: 25, label: 'Degrado minore',       color: 'var(--warn)' },
-    { pct: 50, label: 'Degrado moderato',     color: '#FF9800' },
-    { pct: 75, label: 'Degrado grave',        color: 'var(--bad)' },
-    { pct: 90, label: 'Perdita quasi totale', color: '#9C27B0' }
-  ];
-  cont.innerHTML = thresholds.map(t => {
-    const y = yearsToThreshold(conditions, state.material, t.pct);
-    const txt = !isFinite(y) ? '> 1000' : y > 999 ? '> 999' : y < 1 ? '< 1' : '~' + Math.round(y);
+  const effYears = getEffectiveYears();
+
+  cont.innerHTML = THRESHOLD_INFO.map(t => {
+    const y         = yearsToThreshold(conditions, state.material, t.pct);
+    const reached   = isFinite(y) && effYears >= y;
+    const remaining = isFinite(y) ? y - effYears : Infinity;
+
+    let when;
+    if (reached) {
+      when = 'già raggiunto';
+    } else if (!isFinite(remaining) || remaining > 999) {
+      when = 'oltre 999 anni';
+    } else {
+      when = 'tra ~' + Math.round(remaining) + ' anni';
+    }
+
     return `
-      <div class="threshold-row">
-        <span class="threshold-dot" style="background:${t.color}"></span>
-        <span class="threshold-label">${t.label} (${t.pct}%)</span>
-        <span class="threshold-years" style="color:${t.color}">${txt} anni</span>
+      <div class="threshold-block${reached ? ' reached' : ''}" style="--lvl:${t.color}">
+        <div class="threshold-head">
+          <span class="threshold-dot" style="background:${t.color}"></span>
+          <span class="threshold-title">${t.label} <span class="threshold-pct">${t.pct}%</span></span>
+          <span class="threshold-years">${when}</span>
+        </div>
+        <div class="threshold-detail">
+          <p><span class="td-tag td-mean">Cosa significa</span> ${t.meaning}</p>
+          <p><span class="td-tag td-act">Cosa fare</span> ${t.action}</p>
+        </div>
       </div>`;
   }).join('');
 }

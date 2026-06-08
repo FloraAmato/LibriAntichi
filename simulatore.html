@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
+<body data-page="simulatore">
 
 <div class="top-strip"></div>
 
@@ -81,15 +81,12 @@
     <fieldset>
       <legend>Manoscritto simulato</legend>
       <div class="hypothetical-note">
-        <strong>Codex Hypotheticus</strong> — manoscritto ipotetico, non esistente.
-        Codice beneventano di riferimento utilizzato per la simulazione grafica del
-        comportamento conservativo nel tempo al variare delle condizioni.
+        <strong>Codex Hypotheticus</strong> — volume interamente simulato, non esistente.
+        Codice membranaceo di tipo beneventano (pergamena di pecora, legatura in cuoio,
+        inchiostro ferro-gallico) usato come modello per visualizzare il comportamento
+        conservativo nel tempo al variare delle condizioni ambientali. Non corrisponde
+        ad alcun manoscritto reale della collezione.
       </div>
-      <label class="field" style="margin-top:10px">
-        <span>Codice di riferimento per il modello</span>
-        <select id="selManuscript"></select>
-      </label>
-      <div class="manu-card" id="manuCard"></div>
     </fieldset>
 
     <fieldset>
@@ -207,33 +204,21 @@
       <canvas id="degradation-chart"></canvas>
     </div>
   </div>
-  <div class="section-grid">
-    <div class="card">
-      <div class="card-head"><h2>Previsioni di degrado critico</h2></div>
-      <div class="card-body">
-        <div id="thresholds-container"></div>
-        <p class="hint" style="margin-top:14px">
-          Stime basate su modello di Arrhenius, isoperms ISO 11799, moltiplicatore di Michalski
-          e modello fungino di Sedlbauer.
-        </p>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-head"><h2>Riferimento materiali</h2></div>
-      <div class="card-body">
-        <table class="ref-table">
-          <thead>
-            <tr><th>Materiale</th><th>T ott.</th><th>UR ott.</th><th>Luce</th><th>Inquin.</th><th>Rischio</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Pergamena</td><td>18°C</td><td>45–55%</td><td><span class="star">★★★</span></td><td><span class="star">★★★</span></td><td>Cockling, idrolisi del collagene</td></tr>
-            <tr><td>Vellum</td><td>17°C</td><td>44–54%</td><td><span class="star">★★★★</span></td><td><span class="star">★★★</span></td><td>Sbiadimento miniature</td></tr>
-            <tr><td>Papiro</td><td>20°C</td><td>40–55%</td><td><span class="star">★★★★★</span></td><td><span class="star">★★</span></td><td>Fragilità, delamellazione</td></tr>
-            <tr><td>Cuoio</td><td>18°C</td><td>45–55%</td><td><span class="star">★★</span></td><td><span class="star">★★★★★</span></td><td>Red rot (SO₂)</td></tr>
-            <tr><td>Tavoletta cerata</td><td>15°C</td><td>40–55%</td><td><span class="star">★</span></td><td><span class="star">★</span></td><td>Fusione cera &gt; 25°C</td></tr>
-          </tbody>
-        </table>
-      </div>
+  <div class="card">
+    <div class="card-head"><h2>Previsioni di degrado critico</h2></div>
+    <div class="card-body">
+      <p class="section-intro">
+        Le soglie indicano <strong>quando</strong> il volume simulato raggiungerà ciascun
+        livello di degrado nelle condizioni ambientali attuali e <strong>come intervenire</strong>
+        a ogni stadio. Partendo da un codice nuovo, i tempi mostrano per quanto la conservazione
+        resterà sicura prima di richiedere un intervento. Stime ispirate al modello di Arrhenius,
+        alle <em>isoperms</em> di ISO 11799, al moltiplicatore di vita di Michalski e al modello
+        fungino di Sedlbauer.
+      </p>
+      <div id="thresholds-container"></div>
+      <p class="hint" style="margin-top:14px">
+        Modello didattico: non sostituisce la diagnosi di un conservatore-restauratore.
+      </p>
     </div>
   </div>
 </div>

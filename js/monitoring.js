@@ -91,7 +91,7 @@ function bindControls() {
   const locSel = document.getElementById('monLocation');
   const msSel  = document.getElementById('monManuscript');
   const incBtn = document.getElementById('btnIncident');
-  if (locSel) locSel.addEventListener('change', e => { monState.location = e.target.value; resetBaselines(); });
+  if (locSel) locSel.addEventListener('change', e => { monState.location = e.target.value; resetBaselines(); updateMonitoringView(); });
   if (msSel)  msSel.addEventListener('change',  e => { monState.manuscript = e.target.value; updateMonitoringView(); });
   if (incBtn) incBtn.addEventListener('click', triggerIncident);
 }
@@ -287,6 +287,7 @@ function updateMonitoringView() {
     monState.history.deg.shift();
   }
   drawLiveChart();
+  renderWearPanel();
 
   // Last reading timestamp + uptime
   const tsEl = document.getElementById('lastReading');
@@ -385,6 +386,157 @@ function drawSeries(ctx, arr, color, lo, hi, W, H, lw) {
   ctx.lineWidth   = lw;
   ctx.lineJoin    = 'round';
   ctx.stroke();
+}
+
+// ── Wear curve (grado di usura del manoscritto selezionato) ──────────────────
+function renderWearPanel() {
+  const m = MANUSCRIPTS[monState.manuscript];
+  if (!m) return;
+  const cond = {
+    temp:      monState.sensors.temp,
+    rh:        monState.sensors.rh,
+    light:     monState.sensors.light,
+    pollution: pollutionFromGases()
+  };
+  const label = document.getElementById('wearManuLabel');
+  if (label) label.textContent = `${m.id} · ${m.secolo}`;
+
+  const wearNow = projectDegradation(cond, m.support, Math.max(m.ageYears, 1)).slice(-1)[0].score;
+  renderWearInfo(m, cond, wearNow);
+  drawWearCurve(m, cond);
+}
+
+function renderWearInfo(m, cond, wearNow) {
+  const info = document.getElementById('wearInfo');
+  if (!info) return;
+  const ds       = getDegradationState(wearNow);
+  const t75      = yearsToThreshold(cond, m.support, 75);
+  const residual = isFinite(t75) ? Math.max(0, t75 - m.ageYears) : Infinity;
+  const resTxt   = !isFinite(residual) || residual > 9999 ? '> 9999' : Math.round(residual);
+
+  info.innerHTML = `
+    <div class="wi-big" style="color:${ds.color}">${wearNow.toFixed(1)}<small>% usura attuale</small></div>
+    <div class="wi-state" style="color:${ds.color}">${ds.emoji} ${ds.label}</div>
+    <ul class="wi-list">
+      <li><span>Datazione</span><b>${m.secolo}</b></li>
+      <li><span>Età stimata</span><b>${m.ageYears} anni</b></li>
+      <li><span>Supporto</span><b>${MATERIALS[m.support].name}</b></li>
+      <li><span>Repositorio</span><b>${m.repo}</b></li>
+      <li><span>Vita residua a 75%</span><b>${resTxt} anni</b></li>
+    </ul>
+  `;
+}
+
+let wearCtx = null;
+function drawWearCurve(m, cond) {
+  const cvs = document.getElementById('wearChart');
+  if (!cvs || !m) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = cvs.clientWidth, H = cvs.clientHeight;
+  if (cvs.width !== W * dpr || cvs.height !== H * dpr || !wearCtx) {
+    cvs.width  = W * dpr;
+    cvs.height = H * dpr;
+    wearCtx = cvs.getContext('2d');
+    wearCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  const ctx = wearCtx;
+  const pad = { l: 44, r: 16, t: 16, b: 28 };
+  const pw = W - pad.l - pad.r;
+  const ph = H - pad.t - pad.b;
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#F8F6F4';
+  ctx.fillRect(0, 0, W, H);
+
+  const material = m.support;
+  const maxYears = m.ageYears + 200;
+  const data     = projectDegradation(cond, material, maxYears);
+
+  const xAt = yr    => pad.l + (yr / maxYears) * pw;
+  const yAt = score => pad.t + ph - (score / 100) * ph;
+
+  // Danger zone tints
+  const zones = [
+    { from: 0,  to: 25, c: 'rgba(91,138,74,0.07)' },
+    { from: 25, to: 50, c: 'rgba(198,138,42,0.08)' },
+    { from: 50, to: 75, c: 'rgba(216,96,42,0.08)' },
+    { from: 75, to: 100, c: 'rgba(196,69,54,0.10)' }
+  ];
+  zones.forEach(z => {
+    ctx.fillStyle = z.c;
+    ctx.fillRect(pad.l, yAt(z.to), pw, yAt(z.from) - yAt(z.to));
+  });
+
+  // Grid + Y labels
+  ctx.strokeStyle = 'rgba(168,37,62,0.08)';
+  ctx.fillStyle   = '#9A9A9A';
+  ctx.font        = '10px Inter, sans-serif';
+  ctx.lineWidth   = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + ph - (i / 4) * ph;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + pw, y); ctx.stroke();
+    ctx.textAlign = 'right';
+    ctx.fillText((i * 25) + '%', pad.l - 6, y + 3);
+  }
+
+  // Solid curve up to "oggi"
+  ctx.lineWidth = 2.4;
+  ctx.strokeStyle = '#A8253E';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  let started = false;
+  data.forEach(p => {
+    if (p.year <= m.ageYears) {
+      const x = xAt(p.year), y = yAt(p.score);
+      if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+    }
+  });
+  ctx.stroke();
+
+  // Dashed projection beyond "oggi"
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath();
+  started = false;
+  data.forEach(p => {
+    if (p.year >= m.ageYears) {
+      const x = xAt(p.year), y = yAt(p.score);
+      if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+    }
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // "oggi" vertical marker
+  const xo = xAt(m.ageYears);
+  ctx.strokeStyle = 'rgba(168,37,62,0.55)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath(); ctx.moveTo(xo, pad.t); ctx.lineTo(xo, pad.t + ph); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Today dot
+  const wearNow = projectDegradation(cond, material, Math.max(m.ageYears, 1)).slice(-1)[0].score;
+  ctx.beginPath();
+  ctx.arc(xo, yAt(wearNow), 4.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#A8253E';
+  ctx.fill();
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // "oggi" label
+  ctx.fillStyle = '#A8253E';
+  ctx.font = '600 10px Inter, sans-serif';
+  ctx.textAlign = xo > pad.l + pw - 60 ? 'right' : 'left';
+  ctx.fillText(`oggi · ${m.ageYears}a`, xo + (xo > pad.l + pw - 60 ? -6 : 6), pad.t + 10);
+
+  // X axis labels
+  ctx.fillStyle = '#9A9A9A';
+  ctx.font = '10px Inter, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('anno 0', pad.l, pad.t + ph + 16);
+  ctx.textAlign = 'right';
+  ctx.fillText(maxYears + ' anni', pad.l + pw, pad.t + ph + 16);
 }
 
 document.addEventListener('DOMContentLoaded', initMonitoring);
