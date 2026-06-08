@@ -2,6 +2,11 @@
 
 let chartCanvas = null;
 let chartCtx   = null;
+// Remember the latest draw so the chart can repaint itself after resize
+// (setting canvas.width clears all pixels, leaving an empty white box).
+let _lastData = null;
+let _lastYear = 0;
+let _lastMat  = null;
 
 function initChart(canvasId) {
   chartCanvas = document.getElementById(canvasId);
@@ -14,16 +19,31 @@ function initChart(canvasId) {
 function resizeCanvas() {
   if (!chartCanvas) return;
   const w = chartCanvas.parentElement.clientWidth;
+  if (w <= 0) return;             // wait until layout is ready
   const dpr = window.devicePixelRatio || 1;
   chartCanvas.style.width  = w + 'px';
   chartCanvas.style.height = '320px';
-  chartCanvas.width  = w * dpr;
+  chartCanvas.width  = w * dpr;   // this clears the canvas + resets transform
   chartCanvas.height = 320 * dpr;
+  chartCtx.setTransform(1, 0, 0, 1, 0, 0);
   chartCtx.scale(dpr, dpr);
+  // Repaint with the most recent data if any, otherwise paint an empty axes
+  if (_lastData) drawDegradationChart(_lastData, _lastYear, _lastMat);
+  else paintEmptyChart();
+}
+
+function paintEmptyChart() {
+  if (!chartCtx || !chartCanvas) return;
+  const W = chartCanvas.width  / (window.devicePixelRatio || 1);
+  const H = chartCanvas.height / (window.devicePixelRatio || 1);
+  chartCtx.fillStyle = '#F8F6F4';
+  chartCtx.fillRect(0, 0, W, H);
 }
 
 function drawDegradationChart(data, currentYear, materialId) {
   if (!chartCtx || !chartCanvas) return;
+  // Cache for redraw on resize
+  _lastData = data; _lastYear = currentYear; _lastMat = materialId;
 
   const W = chartCanvas.width  / (window.devicePixelRatio || 1);
   const H = chartCanvas.height / (window.devicePixelRatio || 1);
